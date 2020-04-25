@@ -77,7 +77,7 @@ function setWallpaper(img) {
                 fs.unlinkSync(img);
                 childProc.execFile(
                     `${__dirname}/widnows/Wallpaper/Debug/Wallpaper.exe`,
-                    [bmp.split(path.sep).join("\\\\")],
+                    [path.normalize(bmp)],
                     {
                         stdio: "inherit",
                         shell: true
