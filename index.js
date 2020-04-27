@@ -93,6 +93,65 @@ function setWallpaper(img) {
     }
 }
 
+function gitCommit(msg) {
+    childProc.execFile("git", ["add", "images"], err => {
+        if (err) throw err;
+
+        childProc.execFile("git", ["commit", "-m", msg], err => {
+            if (err) throw err;
+
+            childProc.execFile("git", ["push"], err => {
+                if (err) throw err;
+            });
+        });
+    });
+}
+
+function writeImage(res, url, date) {
+    const id = qs.parse(url.split("?")[1]).id;
+    const mon = path.dirname(date);
+    let dest;
+    if (process.platform === "win32") {
+        dest = path.join("C:/BingWallpaper", mon);
+    } else {
+        dest = path.join("~/BingWallpaper", mon);
+    }
+
+    if (!fs.existsSync(dest)) {
+        fs.mkdirSync(dest, { recursive: true });
+    }
+
+    const imgPath = path.join(dest, id);
+    const img = fs.createWriteStream(imgPath);
+
+    res.on("end", () => {
+        img.close();
+        setWallpaper(imgPath);
+    });
+    res.pipe(img);
+}
+
+function writeImageInfo(info, date) {
+    const mon = path.dirname(date);
+    const name = date.replace(new RegExp(DATE_SEP, "g"), "-");
+    const infoDest = path.join("images", mon);
+
+    if (!fs.existsSync(infoDest)) {
+        fs.mkdirSync(infoDest, { recursive: true });
+    }
+
+    //write the info
+    fs.writeFileSync(
+        path.join(
+            infoDest,
+            name + ".json"
+        ),
+        JSON.stringify(info, null, 4)
+    );
+    
+    gitCommit(date);
+}
+
 function downloadImage(info, handled) {
     const url = JSON.parse(info).images[0].url;
     const req = https.request(
@@ -101,46 +160,14 @@ function downloadImage(info, handled) {
             path: url
         },
         res => {
-            const id = qs.parse(url.split("?")[1]).id;
-            const mon = path.dirname(handled.date);
-            const infoDest = path.join("images", mon);
-            let dest;
-            if (process.platform === "win32") {
-                dest = path.join("C:/BingWallpaper", mon);
-            } else {
-                dest = path.join("~/BingWallpaper", mon);
-            }
-
-            if (!fs.existsSync(dest)) {
-                fs.mkdirSync(dest, { recursive: true });
-            }
-
-            if (!fs.existsSync(infoDest)) {
-                fs.mkdirSync(infoDest, { recursive: true });
-            }
-
-            const imgPath = path.join(dest, id);
-            const img = fs.createWriteStream(imgPath);
-
-            res.on("end", () => {
-                img.close();
-                setWallpaper(imgPath);
-            });
-            res.pipe(img);
-
-            //write the info
-            fs.writeFileSync(
-                path.join(
-                    infoDest,
-                    handled.date.replace(new RegExp(DATE_SEP, "g"), "-") + ".json"
-                ),
-                JSON.stringify(handled, null, 4)
-            );
+            writeImage(res, url, handled.date);
+            writeImageInfo(handled, handled.date);
         }
     );
 
     req.end();
 }
+
 fetchImgInfo((raw, handled) => {
     downloadImage(raw, handled);
 });
