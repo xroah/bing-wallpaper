@@ -29,7 +29,10 @@ function handleImageInfo(info) {
     };
 }
 
+const MAX_RETRIES = 5;
+
 function fetchImgInfo(callback) {
+    let count = 0;
     const now = Date.now();
     const p = "/HPImageArchive.aspx";
     const params = [
@@ -39,25 +42,39 @@ function fetchImgInfo(callback) {
         "nc=" + now,
         "pid=hp"
     ];
-    const req = https.request(
-        {
-            hostname: "cn.bing.com",
-            path: `${p}?${params.join("&")}`
-        },
-        res => {
-            let ret = "";
+    const request = () => {
+        const req = https.request(
+            {
+                hostname: "cn.bing.com",
+                path: `${p}?${params.join("&")}`
+            },
+            res => {
+                let ret = "";
 
-            res.on("data", chunk => ret += chunk);
-            res.on("end", () => {
-                if (typeof callback === "function") {
+                res.on("data", chunk => ret += chunk);
+                res.on("end", () => {
                     callback(ret, handleImageInfo(JSON.parse(ret)));
-                }
-            });
-        }
-    );
+                });
+            }
+        );
 
-    req.on("error", err => console.log(err));
-    req.end();
+        req.on("error", err => {
+            if ((count++) < MAX_RETRIES) {
+                setTimeout(request, 500);
+
+                return;
+            }
+
+            throw err;
+        });
+        req.end();
+    };
+
+    if (typeof callback !== "function") {
+        callback = a => a;
+    }
+
+    request();
 }
 
 function setWallpaper(img) {
@@ -78,14 +95,8 @@ function setWallpaper(img) {
                 childProc.execFile(
                     path.normalize(`${__dirname}/widnows/Wallpaper/bin/Wallpaper.exe`),
                     [path.normalize(bmp)],
-                    {
-                        stdio: "inherit",
-                        shell: true
-                    },
                     err => {
                         if (err) throw err;
-
-                        console.log("Success.");
                     }
                 );
             })
@@ -148,7 +159,7 @@ function writeImageInfo(info, date) {
         ),
         JSON.stringify(info, null, 4)
     );
-    
+
     gitCommit(date);
 }
 
