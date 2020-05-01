@@ -125,7 +125,7 @@ function writeImage(res, url, date) {
     if (process.platform === "win32") {
         dest = path.join("C:/BingWallpaper", mon);
     } else {
-        dest = path.join("~/BingWallpaper", mon);
+        dest = path.join(process.env.HOME, "/BingWallpaper", mon);
     }
 
     if (!fs.existsSync(dest)) {
