@@ -78,7 +78,9 @@ function fetchImgInfo(callback) {
 }
 
 function setWallpaper(img) {
-    if (process.platform === "win32") {
+    const platform = process.platform;
+
+    if (platform === "win32") {
         //windows api only accepts .bmp img
         const imgObj = path.parse(img);
         const bmp = path.join(imgObj.dir, `${imgObj.name}.bmp`);
@@ -101,6 +103,20 @@ function setWallpaper(img) {
                 );
             })
             .catch(err => console.log(err));
+    } else if (platform === "linux") {
+        //gnome desktop
+        childProc.execFile(
+            "gsettings",
+            [
+                "set",
+                "org.gnome.desktop.background",
+                "picture-uri",
+                `file:${img}`
+            ],
+            err => {
+                if (err) throw err
+            }
+        )
     }
 }
 
