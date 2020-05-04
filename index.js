@@ -162,21 +162,28 @@ function writeImageInfo(info, date) {
     const mon = path.dirname(date);
     const name = date.replace(new RegExp(DATE_SEP, "g"), "-");
     const infoDest = path.join("images", mon);
+    const dest = path.join(infoDest, name + ".json");
 
     if (!fs.existsSync(infoDest)) {
         fs.mkdirSync(infoDest, { recursive: true });
     }
 
-    //write the info
-    fs.writeFileSync(
-        path.join(
-            infoDest,
-            name + ".json"
-        ),
-        JSON.stringify(info, null, 4)
-    );
+    childProc.execFile(
+        "git",
+        ["pull"],
+        err => {
+            if (err) throw err
 
-    gitCommit(date);
+            if (!fs.existsSync(dest)) {
+                fs.writeFileSync(
+                    dest,
+                    JSON.stringify(info, null, 4)
+                );
+
+                gitCommit(date);
+            }
+        }
+    );
 }
 
 function downloadImage(info, handled) {
