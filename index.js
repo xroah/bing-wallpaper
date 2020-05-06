@@ -78,7 +78,9 @@ function fetchImgInfo(callback) {
 }
 
 function setWallpaper(img) {
-    if (process.platform === "win32") {
+    const platform = process.platform;
+
+    if (platform === "win32") {
         //windows api only accepts .bmp img
         const imgObj = path.parse(img);
         const bmp = path.join(imgObj.dir, `${imgObj.name}.bmp`);
@@ -101,6 +103,20 @@ function setWallpaper(img) {
                 );
             })
             .catch(err => console.log(err));
+    } else if (platform === "linux") {
+        //gnome desktop
+        childProc.execFile(
+            "gsettings",
+            [
+                "set",
+                "org.gnome.desktop.background",
+                "picture-uri",
+                `file:${img}`
+            ],
+            err => {
+                if (err) throw err
+            }
+        )
     }
 }
 
@@ -125,7 +141,7 @@ function writeImage(res, url, date) {
     if (process.platform === "win32") {
         dest = path.join("C:/BingWallpaper", mon);
     } else {
-        dest = path.join("~/BingWallpaper", mon);
+        dest = path.join(process.env.HOME, "/BingWallpaper", mon);
     }
 
     if (!fs.existsSync(dest)) {
@@ -146,21 +162,28 @@ function writeImageInfo(info, date) {
     const mon = path.dirname(date);
     const name = date.replace(new RegExp(DATE_SEP, "g"), "-");
     const infoDest = path.join("images", mon);
+    const dest = path.join(infoDest, name + ".json");
 
     if (!fs.existsSync(infoDest)) {
         fs.mkdirSync(infoDest, { recursive: true });
     }
 
-    //write the info
-    fs.writeFileSync(
-        path.join(
-            infoDest,
-            name + ".json"
-        ),
-        JSON.stringify(info, null, 4)
-    );
+    childProc.execFile(
+        "git",
+        ["pull"],
+        err => {
+            if (err) throw err
 
-    gitCommit(date);
+            if (!fs.existsSync(dest)) {
+                fs.writeFileSync(
+                    dest,
+                    JSON.stringify(info, null, 4)
+                );
+
+                gitCommit(date);
+            }
+        }
+    );
 }
 
 function downloadImage(info, handled) {
