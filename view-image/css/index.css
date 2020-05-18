@@ -1,0 +1,98 @@
+body {
+    margin: 0;
+    background-color: #282C34;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+dl,
+dd {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    width: 100%;
+    padding: 5px;
+}
+
+@media screen and (min-width: 1200px) {
+    .container {
+        width: 1200px;
+        margin: auto;
+    }
+}
+
+.text-white {
+    color: #fff;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.item-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.item {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0 1%;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all .3s;
+}
+
+@media screen and (min-width: 280px) {
+    .item {
+        width: 48%;
+    }
+}
+
+@media screen and (min-width: 450px) {
+    .item {
+        width: 31.3333333%;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    .item {
+        width: 23%;
+    }
+}
+
+@media screen and (min-width: 800px) {
+    .item {
+        width: 14.66666%;
+    }
+}
+
+.item:hover {
+    background-color: rgba(255, 255, 255, .1);
+}
+
+.item dl {
+    width: 100%;
+}
+
+.item dt {
+    --size: 100px;
+    height: var(--size);
+    background: url(../images/folder.svg) no-repeat center center / var(--size) var(--size);
+}
+
+.item dd {
+    padding: 0 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
