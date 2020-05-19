@@ -25,7 +25,10 @@ function _fetch(url) {
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: "GET",
-            mode: "cors"
+            mode: "cors",
+            headers: {
+                Authorization: "token e39be07062043ba845b46c295df08de100162563"
+            }
         })
             .then(res => {
                 if (res.ok) {
@@ -133,12 +136,15 @@ function renderImage(images) {
             frag.appendChild(a);
         });
         
+        empty(list);
         list.appendChild(frag);
     }
 
     for (let [key, url] of images) {
         promises.push(_fetch(url));
     }
+
+    showLoading();
 
     Promise
         .all(promises)
@@ -148,7 +154,26 @@ function renderImage(images) {
                     item => JSON.parse(Base64.decode(item.content))
                 )
             );
+
+            hideLoading();
         });
+}
+
+function render404() {
+    const div = document.createElement("div");
+    const btn = document.createElement("button");
+    const list = document.querySelector(".item-list");
+
+    div.innerHTML = "<div>404</div><div>内容不存在。</div>";
+    btn.innerHTML = "返回";
+
+    div.classList.add("error-404");
+    div.appendChild(btn);
+    btn.classList.add("btn", "btn-primary");
+    empty(list);
+    list.appendChild(div);
+
+    btn.addEventListener("click", () => history.back());
 }
 
 function handleHashChange() {
@@ -172,7 +197,7 @@ function handleHashChange() {
         map = map.get(p);
 
         if (!map) {
-            return;
+            return render404();
         }
     }
     if (map.isFile) {
@@ -184,12 +209,20 @@ function handleHashChange() {
     back.style.display = "block";
 }
 
+function back() {
+    const hash = location.hash.substring("#/").split("/");
+
+    hash.pop();
+    location.href = `${location.origin}/${location.pathname}#/${hash.join("/")}`
+}
+
 function init(data) {
     treeMap = parseData(data);
 
     hideLoading();
     handleHashChange();
     window.addEventListener("hashchange", handleHashChange);
+    document.querySelector(".back").addEventListener("click", back);
 }
 
 showLoading();

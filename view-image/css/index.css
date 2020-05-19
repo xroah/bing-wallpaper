@@ -168,7 +168,7 @@ a {
 
 .btn-primary {
     color: #fff;
-    background-color: var(--primary);
+    background-color: #007bff;
     border-color: #007bff;
 }
 
@@ -234,6 +234,20 @@ a {
 
 .back:hover {
     color: #007daa;
+}
+
+.error-404 {
+    width: 100%;
+    color: #fff;
+    text-align: center;
+}
+.error-404 :first-child {
+    font-size: 160px;
+}
+
+.error-404 :nth-child(2) {
+    margin-bottom: 20px;
+    font-size: 16px;
 }
 
 @keyframes spin {
