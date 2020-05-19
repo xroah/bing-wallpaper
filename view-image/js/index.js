@@ -2,8 +2,26 @@
 const TREE_URL = "https://api.github.com/repos/xroah/bing-pic/git/trees/f4844b89c61b7e04e148850b5472567eb990e456?recursive=1";
 
 let treeMap;
+let loadingEl;
+
+function showLoading() {
+    if (loadingEl) return;
+
+    loadingEl = document.createElement("div");
+
+    loadingEl.classList.add("loading");
+    document.body.appendChild(loadingEl);
+}
+
+function hideLoading() {
+    if (!loadingEl) return;
+
+    document.body.removeChild(loadingEl);
+    loadingEl = null;
+}
 
 function _fetch(url) {
+
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: "GET",
@@ -42,7 +60,15 @@ function parseData(data) {
             }
 
             if (p.endsWith(".json")) {
-                map.set(p, item.url)
+                map.set(p, item.url);
+
+                if (!map.hasOwnProperty("isFile")) {
+                    Object.defineProperty(
+                        map,
+                        "isFile",
+                        { value: true }
+                    );
+                }
             }
 
             map = _map;
@@ -52,13 +78,12 @@ function parseData(data) {
     return ret;
 }
 
-function createA(text, isFolder) {
+function createA(text, href) {
     const a = document.createElement("a");
     const dl = document.createElement("dl");
     const dd = document.createElement("dd");
 
-    a.isFolder = isFolder;
-    a.href = "javascript: void 0;";
+    a.href = href;
     dd.innerHTML = text;
 
     a.classList.add("item");
@@ -70,29 +95,102 @@ function createA(text, isFolder) {
     return a;
 }
 
-function renderFolder(folders) {
+function empty(el) {
+    if (el.hasChildNodes()) {
+        Array.from(el.childNodes)
+            .forEach(c => el.removeChild(c));
+    }
+}
+
+function renderFolder(folders, prefix) {
     const list = document.querySelector(".item-list");
     const frag = document.createDocumentFragment();
 
+    empty(list);
+
     for (let folder of folders) {
-        frag.appendChild(createA(folder, true));
+        frag.appendChild(createA(folder, `#/${prefix || ""}${folder}`));
     }
 
     list.appendChild(frag);
 }
 
+function renderImage(images) {
+    let promises = [];
+    let render = imgs => {
+        const list = document.querySelector(".item-list");
+        const frag = document.createDocumentFragment();
+
+        imgs.forEach(img => {
+            const a = createA(img.date);
+            const imgEl = new Image();
+
+            imgEl.src = img.url;
+
+            a.classList.add("img-item");
+            a.setAttribute("data-url", img.url);
+            a.querySelector("dt").append(imgEl);
+            frag.appendChild(a);
+        });
+        
+        list.appendChild(frag);
+    }
+
+    for (let [key, url] of images) {
+        promises.push(_fetch(url));
+    }
+
+    Promise
+        .all(promises)
+        .then(res => {
+            render(
+                res.map(
+                    item => JSON.parse(Base64.decode(item.content))
+                )
+            );
+        });
+}
+
 function handleHashChange() {
     const hash = location.hash.split("#/")[1];
+    const two = num => (100 + num).toString().substring(1);
+    const back = document.querySelector(".back-wrapper");
 
     if (!hash) {
+        back.style.display = "none";
         return renderFolder(treeMap.keys());
     }
+
+    const path = hash.split("/");
+    let map = treeMap;
+
+    for (let p of path) {
+        if (p.length === 1) {
+            p = two(+p);
+        }
+
+        map = map.get(p);
+
+        if (!map) {
+            return;
+        }
+    }
+    if (map.isFile) {
+        renderImage(map.entries());
+    } else {
+        renderFolder(map.keys(), `${hash}/`);
+    }
+
+    back.style.display = "block";
 }
 
 function init(data) {
     treeMap = parseData(data);
 
+    hideLoading();
     handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
 }
 
+showLoading();
 _fetch(TREE_URL).then(init);
