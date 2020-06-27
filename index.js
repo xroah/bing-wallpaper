@@ -120,20 +120,6 @@ function setWallpaper(img) {
     }
 }
 
-function gitCommit(msg) {
-    childProc.execFile("git", ["add", "images"], err => {
-        if (err) throw err;
-
-        childProc.execFile("git", ["commit", "-m", msg], err => {
-            if (err) throw err;
-
-            childProc.execFile("git", ["push"], err => {
-                if (err) throw err;
-            });
-        });
-    });
-}
-
 function writeImage(res, url, date) {
     const id = qs.parse(url.split("?")[1]).id;
     const mon = path.dirname(date);
@@ -158,34 +144,6 @@ function writeImage(res, url, date) {
     res.pipe(img);
 }
 
-function writeImageInfo(info, date) {
-    const mon = path.dirname(date);
-    const name = date.replace(new RegExp(DATE_SEP, "g"), "-");
-    const infoDest = path.join("images", mon);
-    const dest = path.join(infoDest, name + ".json");
-
-    if (!fs.existsSync(infoDest)) {
-        fs.mkdirSync(infoDest, { recursive: true });
-    }
-
-    childProc.execFile(
-        "git",
-        ["pull"],
-        err => {
-            if (err) throw err
-
-            if (!fs.existsSync(dest)) {
-                fs.writeFileSync(
-                    dest,
-                    JSON.stringify(info, null, 4)
-                );
-
-                gitCommit(date);
-            }
-        }
-    );
-}
-
 function downloadImage(info, handled) {
     const url = JSON.parse(info).images[0].url;
     const req = https.request(
@@ -195,7 +153,6 @@ function downloadImage(info, handled) {
         },
         res => {
             writeImage(res, url, handled.date);
-            writeImageInfo(handled, handled.date);
         }
     );
 
