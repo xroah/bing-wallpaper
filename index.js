@@ -91,6 +91,7 @@ function handleImageInfo(info) {
 
 const MAX_RETRIES = 5
 
+
 function fetchImgInfo(callback) {
     let count = 0
     const now = Date.now()
@@ -109,11 +110,11 @@ function fetchImgInfo(callback) {
                 path: `${p}?${params}`
             },
             res => {
-                let ret = ""
+                let ret = Buffer.from("")
 
-                res.on("data", chunk => ret += chunk)
+                res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
                 res.on("end", () => {
-                    callback(ret, handleImageInfo(JSON.parse(ret)))
+                    callback(ret, handleImageInfo(ret.toJSON))
                 })
             }
         )
@@ -185,6 +186,7 @@ function writeImage(res, url, date) {
     const id = qs.parse(url.split("?")[1]).id
     const mon = path.dirname(date)
     let dest
+    
     if (process.platform === "win32") {
         dest = path.join("C:/BingWallpaper", mon)
     } else {
