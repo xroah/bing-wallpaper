@@ -93,13 +93,12 @@ const MAX_RETRIES = 5
 
 function fetchImgInfo(callback) {
     let count = 0
-    const now = Date.now()
     const p = "/HPImageArchive.aspx"
     const params = [
         "format=js",
         "idx=0",
         "n=1",
-        "nc=" + now,
+        "nc=" + Date.now(),
         "pid=hp"
     ].join("&")
     const request = () => {
@@ -109,25 +108,25 @@ function fetchImgInfo(callback) {
                 path: `${p}?${params}`
             },
             res => {
-                let ret = ""
+                let ret = Buffer.from("")
 
-                res.on("data", chunk => ret += chunk)
+                res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
                 res.on("end", () => {
-                    callback(ret, handleImageInfo(JSON.parse(ret)))
+                    const info = JSON.parse(ret.toString())
+
+                    callback(ret, handleImageInfo(info))
                 })
             }
         )
 
         req.on("error", err => {
             if ((count++) < MAX_RETRIES) {
-                setTimeout(request, 300)
-
-                return
+                return setTimeout(request, 300)
             }
 
             throw err
         })
-        
+
         req.end()
     }
 
@@ -163,7 +162,6 @@ function setWallpaper(img) {
                     }
                 )
             })
-            .catch(err => console.log(err))
     } else if (platform === "linux") {
         //gnome desktop
         childProc.execFile(
@@ -184,12 +182,9 @@ function setWallpaper(img) {
 function writeImage(res, url, date) {
     const id = qs.parse(url.split("?")[1]).id
     const mon = path.dirname(date)
-    let dest
-    if (process.platform === "win32") {
-        dest = path.join("C:/BingWallpaper", mon)
-    } else {
-        dest = path.join(process.env.HOME, "/BingWallpaper", mon)
-    }
+    let dest = process.platform === "win32" ?
+        path.join("C:/BingWallpaper", mon) :
+        path.join(process.env.HOME, "/BingWallpaper", mon)
 
     if (!fs.existsSync(dest)) {
         fs.mkdirSync(dest, { recursive: true })
@@ -197,12 +192,12 @@ function writeImage(res, url, date) {
 
     const imgPath = path.join(dest, id)
     const img = fs.createWriteStream(imgPath)
-
+    
+    res.pipe(img)
     res.on("end", () => {
         img.close()
         setWallpaper(imgPath)
     })
-    res.pipe(img)
 }
 
 function downloadImage(info, handled) {
