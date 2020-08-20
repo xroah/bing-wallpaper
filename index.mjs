@@ -91,13 +91,12 @@ const MAX_RETRIES = 5
 
 function fetchImgInfo(callback) {
     let count = 0
-    const now = Date.now()
     const p = "/HPImageArchive.aspx"
     const params = [
         "format=js",
         "idx=0",
         "n=1",
-        "nc=" + now,
+        "nc=" + Date.now(),
         "pid=hp"
     ].join("&")
     const request = () => {
@@ -118,14 +117,12 @@ function fetchImgInfo(callback) {
 
         req.on("error", err => {
             if ((count++) < MAX_RETRIES) {
-                setTimeout(request, 300)
-
-                return
+                return setTimeout(request, 300)
             }
 
             throw err
         })
-        
+
         req.end()
     }
 
@@ -161,7 +158,6 @@ function setWallpaper(img) {
                     }
                 )
             })
-            .catch(err => console.log(err))
     } else if (platform === "linux") {
         //gnome desktop
         childProc.execFile(
@@ -196,12 +192,12 @@ function writeImage(res, url, date) {
 
     const imgPath = path.join(dest, id)
     const img = fs.createWriteStream(imgPath)
-
+    
+    res.pipe(img)
     res.on("end", () => {
         img.close()
         setWallpaper(imgPath)
     })
-    res.pipe(img)
 }
 
 function downloadImage(info, handled) {
