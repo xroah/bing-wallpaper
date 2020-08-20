@@ -1,11 +1,9 @@
-"use strict"
-
-const fs = require("fs")
-const path = require("path")
-const https = require("https")
-const Jimp = require("jimp")
-const qs = require("querystring")
-const childProc = require("child_process")
+import fs from "fs"
+import path from "path"
+import https from "https"
+import Jimp from "jimp"
+import qs from "querystring"
+import childProc from "child_process"
 
 const DATE_SEP = "/"
 /* 
@@ -91,7 +89,6 @@ function handleImageInfo(info) {
 
 const MAX_RETRIES = 5
 
-
 function fetchImgInfo(callback) {
     let count = 0
     const now = Date.now()
@@ -114,7 +111,7 @@ function fetchImgInfo(callback) {
 
                 res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
                 res.on("end", () => {
-                    callback(ret, handleImageInfo(ret.toJSON))
+                    callback(ret, handleImageInfo(JSON.parse(ret.toString())))
                 })
             }
         )
