@@ -89,7 +89,19 @@ function handleImageInfo(info) {
 
 const MAX_RETRIES = 5
 
-function fetchImgInfo(callback) {
+function handleResponse(res) {
+    let ret = Buffer.from("")
+
+    res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
+    res.on("end", () => {
+        downloadImage(
+            ret,
+            handleImageInfo(JSON.parse(ret.toString()))
+        )
+    })
+}
+
+function fetchImg() {
     let count = 0
     const p = "/HPImageArchive.aspx"
     const params = [
@@ -105,14 +117,7 @@ function fetchImgInfo(callback) {
                 hostname: "cn.bing.com",
                 path: `${p}?${params}`
             },
-            res => {
-                let ret = Buffer.from("")
-
-                res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
-                res.on("end", () => {
-                    callback(ret, handleImageInfo(JSON.parse(ret.toString())))
-                })
-            }
+            handleResponse
         )
 
         req.on("error", err => {
@@ -124,10 +129,6 @@ function fetchImgInfo(callback) {
         })
 
         req.end()
-    }
-
-    if (typeof callback !== "function") {
-        callback = a => a
     }
 
     request()
@@ -179,7 +180,7 @@ function writeImage(res, url, date) {
     const id = qs.parse(url.split("?")[1]).id
     const mon = path.dirname(date)
     let dest
-    
+
     if (process.platform === "win32") {
         dest = path.join("C:/BingWallpaper", mon)
     } else {
@@ -187,12 +188,12 @@ function writeImage(res, url, date) {
     }
 
     if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest, { recursive: true })
+        fs.mkdirSync(dest, {recursive: true})
     }
 
     const imgPath = path.join(dest, id)
     const img = fs.createWriteStream(imgPath)
-    
+
     res.pipe(img)
     res.on("end", () => {
         img.close()
@@ -215,6 +216,4 @@ function downloadImage(info, handled) {
     req.end()
 }
 
-fetchImgInfo((raw, handled) => {
-    downloadImage(raw, handled)
-})
+fetchImg()
