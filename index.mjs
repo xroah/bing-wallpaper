@@ -6,6 +6,18 @@ import qs from "querystring"
 import childProc from "child_process"
 
 const DATE_SEP = "/"
+const MAX_RETRIES = 5
+
+function getCurrentDay() {
+    const date = new Date()
+    const year = date.getFullYear()
+    const mon = date.getMonth() + 1
+    const day = date.getDate()
+    const convert = num => (100 + num).toString().substring(1)
+
+    return `${year}${DATE_SEP}${convert(mon)}${DATE_SEP}${convert(day)}`
+}
+
 /* 
 * //image info structure:
 {
@@ -70,15 +82,9 @@ const DATE_SEP = "/"
 function handleImageInfo(info) {
     const image = info.images[0]
     const hostname = "https://cn.bing.com"
-    const date = new Date()
-    const year = date.getFullYear()
-    const mon = date.getMonth() + 1
-    const day = date.getDate()
-    const convert = num => (100 + num).toString().substring(1)
-    const dateStr = `${year}${DATE_SEP}${convert(mon)}${DATE_SEP}${convert(day)}`
 
     return {
-        date: dateStr,
+        date: getCurrentDay(),
         copyright: image.copyright,
         copyrightUrl: `${hostname}${image.copyrightlink}`,
         url: `${hostname}${image.url}`,
@@ -87,21 +93,7 @@ function handleImageInfo(info) {
     }
 }
 
-const MAX_RETRIES = 5
-
-function handleResponse(res) {
-    let ret = Buffer.from("")
-
-    res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
-    res.on("end", () => {
-        downloadImage(
-            ret,
-            handleImageInfo(JSON.parse(ret.toString()))
-        )
-    })
-}
-
-function fetchImg() {
+function fetchImage() {
     let count = 0
     const p = "/HPImageArchive.aspx"
     const params = [
@@ -132,6 +124,52 @@ function fetchImg() {
     }
 
     request()
+}
+
+function handleResponse(res) {
+    let ret = Buffer.from("")
+
+    res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
+    res.on("end", () => {
+        const imageInfo = handleImageInfo(JSON.parse(ret.toString()))
+
+        downloadImage(imageInfo)
+    })
+}
+
+function downloadImage(imageInfo) {
+    const url = imageInfo.url
+    const req = https.request(
+        {
+            hostname: "cn.bing.com",
+            path: url
+        },
+        res => writeImage(res, url, imageInfo.date)
+    )
+
+    req.end()
+}
+
+function writeImage(res, url, date) {
+    const id = qs.parse(url.split("?")[1]).id//xxxx.jpg
+    const mon = path.dirname(date)
+    let dest = path.join(
+        process.platform === "win32" ? "C:" : process.env.HOME,
+        `/BingWallpaper/${mon}`
+    )
+
+    if (!fs.existsSync(dest)) {
+        fs.mkdirSync(dest, {recursive: true})
+    }
+
+    const imgPath = path.join(dest, id)
+    const img = fs.createWriteStream(imgPath)
+
+    res.pipe(img)
+    res.on("end", () => {
+        img.close()
+        setWallpaper(imgPath)
+    })
 }
 
 function setWallpaper(img) {
@@ -176,44 +214,4 @@ function setWallpaper(img) {
     }
 }
 
-function writeImage(res, url, date) {
-    const id = qs.parse(url.split("?")[1]).id
-    const mon = path.dirname(date)
-    let dest
-
-    if (process.platform === "win32") {
-        dest = path.join("C:/BingWallpaper", mon)
-    } else {
-        dest = path.join(process.env.HOME, "/BingWallpaper", mon)
-    }
-
-    if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest, {recursive: true})
-    }
-
-    const imgPath = path.join(dest, id)
-    const img = fs.createWriteStream(imgPath)
-
-    res.pipe(img)
-    res.on("end", () => {
-        img.close()
-        setWallpaper(imgPath)
-    })
-}
-
-function downloadImage(info, handled) {
-    const url = JSON.parse(info).images[0].url
-    const req = https.request(
-        {
-            hostname: "cn.bing.com",
-            path: url
-        },
-        res => {
-            writeImage(res, url, handled.date)
-        }
-    )
-
-    req.end()
-}
-
-fetchImg()
+fetchImage()
