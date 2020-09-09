@@ -9,13 +9,13 @@ const DATE_SEP = "/"
 const MAX_RETRIES = 5
 
 function getCurrentDay() {
+    const convert = n => n < 10 ? `0${n}` : n.toString()
     const date = new Date()
     const year = date.getFullYear()
-    const mon = date.getMonth() + 1
-    const day = date.getDate()
-    const convert = num => (100 + num).toString().substring(1)
+    const mon = convert(date.getMonth() + 1)
+    const day = convert(date.getDate())
 
-    return `${year}${DATE_SEP}${convert(mon)}${DATE_SEP}${convert(day)}`
+    return `${year}${DATE_SEP}${mon}${DATE_SEP}${day}`
 }
 
 /* 
@@ -104,23 +104,25 @@ function fetchImage() {
         "pid=hp"
     ].join("&")
     const request = () => {
-        const req = https.request(
-            {
-                hostname: "cn.bing.com",
-                path: `${p}?${params}`
-            },
-            handleResponse
-        )
+        https
+            .request(
+                {
+                    hostname: "cn.bing.com",
+                    path: `${p}?${params}`
+                },
+                handleResponse
+            )
+            .on(
+                "error",
+                err => {
+                    if ((count++) < MAX_RETRIES) {
+                        return setTimeout(request, 300)
+                    }
 
-        req.on("error", err => {
-            if ((count++) < MAX_RETRIES) {
-                return setTimeout(request, 300)
-            }
-
-            throw err
-        })
-
-        req.end()
+                    throw err
+                }
+            )
+            .end()
     }
 
     request()
@@ -129,72 +131,96 @@ function fetchImage() {
 function handleResponse(res) {
     let ret = Buffer.from("")
 
-    res.on("data", chunk => ret = Buffer.concat([ret, chunk]))
-    res.on("end", () => {
-        const imageInfo = handleImageInfo(JSON.parse(ret.toString()))
+    res
+        .on(
+            "data",
+            chunk => ret = Buffer.concat([ret, chunk])
+        )
+        .on(
+            "end",
+            () => {
+                ret = JSON.parse(ret.toString())
 
-        downloadImage(imageInfo)
-    })
+                downloadImage(
+                    handleImageInfo(ret)
+                )
+            }
+        )
 }
 
 function downloadImage(imageInfo) {
     const url = imageInfo.url
-    const req = https.request(
-        {
-            hostname: "cn.bing.com",
-            path: url
-        },
-        res => writeImage(res, url, imageInfo.date)
-    )
 
-    req.end()
+    https
+        .request(
+            {
+                hostname: "cn.bing.com",
+                path: url
+            },
+            res => writeImage(
+                res,
+                url,
+                imageInfo.date
+            )
+        )
+        .end()
 }
 
 function writeImage(res, url, date) {
     const id = qs.parse(url.split("?")[1]).id//xxxx.jpg
     const mon = path.dirname(date)
     let dest = path.join(
-        process.platform === "win32" ? "C:" : process.env.HOME,
+        process.platform === "win32" ?
+            "C:" : process.env.HOME,
         `/BingWallpaper/${mon}`
     )
 
     if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest, {recursive: true})
+        fs.mkdirSync(
+            dest,
+            {
+                recursive: true
+            }
+        )
     }
 
     const imgPath = path.join(dest, id)
     const img = fs.createWriteStream(imgPath)
 
     res.pipe(img)
-    res.on("end", () => {
-        img.close()
-        setWallpaper(imgPath)
-    })
+    res.on(
+        "end",
+        () => {
+            img.close()
+            setWallpaper(imgPath)
+        }
+    )
 }
 
 function setWallpaper(img) {
     const platform = process.platform
+    const handleError = err => {
+        if (err) {
+            throw err
+        }
+    }
 
     if (platform === "win32") {
         //windows api only accepts .bmp img
         const imgObj = path.parse(img)
         const bmp = path.join(imgObj.dir, `${imgObj.name}.bmp`)
+        const exeFile = "/widnows/Wallpaper/bin/Wallpaper.exe"
 
         Jimp
             .read(img)
-            .then(data => {
-                //convert to  bmp img
-                return data.write(bmp)
-            })
+            .then(data => data.write(bmp)) //convert to  bmp img)
             .then(() => {
                 //remove the original image
                 fs.unlinkSync(img)
                 childProc.execFile(
-                    path.normalize(`${__dirname}/widnows/Wallpaper/bin/Wallpaper.exe`),
+                    path.normalize(`${__dirname}${exeFile}`),
                     [path.normalize(bmp)],
-                    err => {
-                        if (err) throw err
-                    }
+                    handleError
                 )
             })
     } else if (platform === "linux") {
@@ -207,9 +233,7 @@ function setWallpaper(img) {
                 "picture-uri",
                 `file:${img}`
             ],
-            err => {
-                if (err) throw err
-            }
+            handleError
         )
     }
 }
