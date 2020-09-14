@@ -149,31 +149,27 @@ function handleResponse(res) {
 }
 
 function downloadImage(imageInfo) {
-    const url = imageInfo.url
-
     https
         .request(
             {
                 hostname: "cn.bing.com",
-                path: url
+                path: imageInfo.url
             },
-            res => writeImage(
-                res,
-                url,
-                imageInfo.date
-            )
+            res => writeImage(res, imageInfo)
         )
         .end()
 }
 
-function writeImage(res, url, date) {
-    const id = qs.parse(url.split("?")[1]).id//xxxx.jpg
-    const mon = path.dirname(date)
+function writeImage(res, imageInfo) {
+    const url = imageInfo.url.split("?")[1]
+    const id = qs.parse(url).id//xxxx.jpg
+    const mon = path.dirname(imageInfo.date)
     let dest = path.join(
         process.platform === "win32" ?
             "C:" : process.env.HOME,
         `/BingWallpaper/${mon}`
     )
+    const date = imageInfo.date.replace(/\//g, "-")
 
     if (!fs.existsSync(dest)) {
         fs.mkdirSync(
@@ -194,6 +190,12 @@ function writeImage(res, url, date) {
             img.close()
             setWallpaper(imgPath)
         }
+    )
+
+    //write image info
+    fs.writeFileSync(
+        `${dest}/${date}.json`,
+        JSON.stringify(imageInfo, null, 4)
     )
 }
 
