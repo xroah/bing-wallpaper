@@ -16,7 +16,5 @@
     "url": "https://github.com/xroah/bing-pic/issues"
   },
   "homepage": "https://github.com/xroah/bing-pic#readme",
-  "dependencies": {
-    "jimp": "^0.10.3"
-  }
+  "dependencies": {}
 }

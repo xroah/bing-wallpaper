@@ -1,7 +1,6 @@
 import fs from "fs"
 import path from "path"
 import https from "https"
-import Jimp from "jimp"
 import qs from "querystring"
 import childProc from "child_process"
 
@@ -207,25 +206,7 @@ function setWallpaper(img) {
         }
     }
 
-    if (platform === "win32") {
-        //windows api only accepts .bmp img
-        const imgObj = path.parse(img)
-        const bmp = path.join(imgObj.dir, `${imgObj.name}.bmp`)
-        const exeFile = "/widnows/Wallpaper/bin/Wallpaper.exe"
-
-        Jimp
-            .read(img)
-            .then(data => data.write(bmp)) //convert to  bmp img)
-            .then(() => {
-                //remove the original image
-                fs.unlinkSync(img)
-                childProc.execFile(
-                    path.normalize(`${__dirname}${exeFile}`),
-                    [path.normalize(bmp)],
-                    handleError
-                )
-            })
-    } else if (platform === "linux") {
+    if (platform === "linux") {
         //gnome desktop
         childProc.execFile(
             "gsettings",
