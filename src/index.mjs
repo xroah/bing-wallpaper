@@ -185,10 +185,7 @@ function writeImage(res, imageInfo) {
     res.pipe(img)
     res.on(
         "end",
-        () => {
-            img.close()
-            setWallpaper(imgPath)
-        }
+        () => img.close()
     )
 
     //write image info
@@ -196,29 +193,6 @@ function writeImage(res, imageInfo) {
         `${dest}/${date}.json`,
         JSON.stringify(imageInfo, null, 4)
     )
-}
-
-function setWallpaper(img) {
-    const platform = process.platform
-    const handleError = err => {
-        if (err) {
-            throw err
-        }
-    }
-
-    if (platform === "linux") {
-        //gnome desktop
-        childProc.execFile(
-            "gsettings",
-            [
-                "set",
-                "org.gnome.desktop.background",
-                "picture-uri",
-                `file:${img}`
-            ],
-            handleError
-        )
-    }
 }
 
 fetchImage()
