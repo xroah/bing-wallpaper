@@ -1,6 +1,8 @@
 import {Configuration} from "webpack"
 import {Configuration as ServerConf} from "webpack-dev-server"
 import HTMLWebpackPlugin from "html-webpack-plugin"
+import MiniCSSExtractPlugin from "mini-css-extract-plugin"
+import {CleanWebpackPlugin} from "clean-webpack-plugin"
 import path from "path"
 
 export default function genConf(env: {prod?: boolean}) {
@@ -12,8 +14,15 @@ export default function genConf(env: {prod?: boolean}) {
             path: path.join(__dirname, "dist"),
             filename: "[name].[contenthash].js"
         },
+        resolve: {
+            extensions: [".js", ".ts"]
+        },
         module: {
             rules: [
+                {
+                    test: /\.html$/,
+                    use: "html-loader"
+                },
                 {
                     test: /\.ts$/,
                     use: "ts-loader"
@@ -21,7 +30,7 @@ export default function genConf(env: {prod?: boolean}) {
                 {
                     test: /\.s?css$/,
                     use: [
-                        "style-loader",
+                        isProd ? MiniCSSExtractPlugin.loader : "style-loader",
                         "css-loader",
                         "sass-loader"
                     ]
@@ -43,6 +52,13 @@ export default function genConf(env: {prod?: boolean}) {
             open: true,
             hot: true
         } as ServerConf
+    } else {
+        cfg.plugins!.push(
+            new MiniCSSExtractPlugin({
+                filename: "[name].[contenthash].css"
+            }),
+            new CleanWebpackPlugin()
+        )
     }
 
     return cfg
