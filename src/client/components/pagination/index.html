@@ -1,10 +1,24 @@
-<nav></nav>
+<div class="root">
+    <nav></nav>
+    <div class="go-wrapper">
+        <span>跳转至</span>
+        <input class="input" />
+        <span>页</span>
+        <btn-comp size="sm" class="go">确定</btn-comp>
+    </div>
+</div>
 <style>
+    .root {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .pagination {
         display: flex;
         padding-left: 0;
         list-style: none;
-        user-select: none;
+        line-height: 1.2;
     }
 
     .page-link {
@@ -15,6 +29,7 @@
         background-color: #fff;
         border: 1px solid #dee2e6;
         transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        user-select: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -67,5 +82,30 @@
     .page-item:last-child .page-link {
         border-top-right-radius: 0.25rem;
         border-bottom-right-radius: 0.25rem;
+    }
+
+    .go-wrapper {
+        margin: 0 10px;
+        color: #999;
+    }
+
+    .go-wrapper .input {
+        margin: 0 5px;
+        width: 50px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        border-radius: 3px;
+        outline: none;
+        transition: all .15s;
+    }
+
+    .go-wrapper .input:focus {
+        border-color: var(--primary-focus-color);
+        box-shadow: var(--focus-box-shadow);
+    }
+
+    .go-wrapper .go {
+        margin-left: 5px;
     }
 </style>
