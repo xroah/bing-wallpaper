@@ -1,21 +1,16 @@
-<div class="root">
-    <nav></nav>
-</div>
+<nav></nav>
 <style>
-    .root {
-        display: flex;
-    }
-
     .pagination {
         display: flex;
         padding-left: 0;
         list-style: none;
+        user-select: none;
     }
 
     .page-link {
         position: relative;
         display: block;
-        color: #0d6efd;
+        color: var(--primary-color);
         text-decoration: none;
         background-color: #fff;
         border: 1px solid #dee2e6;
@@ -30,17 +25,16 @@
 
     .page-link:hover {
         z-index: 2;
-        color: #0a58ca;
+        z-index: var(--primary-focus-color);
         background-color: #e9ecef;
         border-color: #dee2e6;
     }
 
     .page-link:focus {
         z-index: 3;
-        color: #0a58ca;
+        color: var(--primary-focus-color);
         background-color: #e9ecef;
         outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
 
     .page-item:not(:first-child) .page-link {
@@ -50,8 +44,8 @@
     .page-item.active .page-link {
         z-index: 3;
         color: #fff;
-        background-color: #0d6efd;
-        border-color: #0d6efd;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
 
     .page-item.disabled .page-link {
