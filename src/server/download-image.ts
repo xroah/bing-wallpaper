@@ -44,16 +44,41 @@ export function request(url: string): Promise<Buffer> {
     })
 }
 
+function getDir() {
+    const baseDir = `${process.env["HOME"] || "/"}BingPic`
+    const date = new Date()
+    const dateDir = `/${date.getFullYear()}/${padZero(date.getMonth() + 1)}`
+    const downloadDir = path.join(baseDir, dateDir)
+
+    if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, {recursive: true})
+    }
+
+    return downloadDir
+}
+
 export function parse(html: string) {
+    const reg = /\d+x\d+/g
+    const THUMBNAIL_RESOLUTION = "400x240"
     const $ = load(html)
     const card = $(".musCard")
     const downloadLink = card.find(".downloadLink").attr("href")
     const title = card.find(".title").text()
     const copyright = card.find(".copyright").text()
     const headline = card.find(".headline .text").text()
+    const imageLink = `${HOST}${downloadLink}`
+    const urlObj = new URL(imageLink)
+    const filename = urlObj.searchParams.get("id")!
+    const thumbnailName = filename.replace(reg, THUMBNAIL_RESOLUTION)
+    const dir = getDir()
 
     return {
-        downloadLink: `${HOST}${downloadLink}`,
+        imageLink,
+        imageName: filename,
+        thumbnailName,
+        thumbnailLink: imageLink.replace(reg, THUMBNAIL_RESOLUTION),
+        imagePath: path.normalize(path.join(dir, filename)),
+        thumbnailPath: path.normalize(path.join(dir, thumbnailName)),
         title,
         copyright,
         headline,
@@ -61,25 +86,14 @@ export function parse(html: string) {
     }
 }
 
-export async function downloadImage(url: string) {
-    const urlObj = new URL(url)
-    const baseDir = `${process.env["HOME"] || "/"}BingPic`
-    const date = new Date()
-    const dateDir = `/${date.getFullYear()}/${padZero(date.getMonth() + 1)}`
-    const downloadDir = path.join(baseDir, dateDir)
-    const filename = urlObj.searchParams.get("id")
-
-    if (!fs.existsSync(downloadDir)) {
-        fs.mkdirSync(downloadDir, {recursive: true})
-    }
-
+export async function downloadImage(url: string, filePath: string) {
     try {
         let data = await request(url)
 
-        fs.writeFileSync(`${downloadDir}/${filename}`, data)
+        fs.writeFileSync(filePath, data)
     } catch (error) {
         return false
     }
 
-    return filename
+    return true
 }
