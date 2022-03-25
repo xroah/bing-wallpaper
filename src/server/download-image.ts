@@ -79,8 +79,7 @@ export function parse(html: string) {
         thumbnailLink: imageLink.replace(reg, THUMBNAIL_RESOLUTION),
         imagePath: path.normalize(path.join(dir, filename)),
         thumbnailPath: path.normalize(path.join(dir, thumbnailName)),
-        title,
-        copyright,
+        title: `${title} (${copyright})`,
         headline,
         date: getDateString()
     }

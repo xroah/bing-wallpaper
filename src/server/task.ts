@@ -13,42 +13,44 @@ import {
 
 let MAX_RETRIES = 10
 
-schedule.scheduleJob("00 00 06 * * *", () => {
-    let count = 0
-    let saveCount = 0
-    let s = async (v: OptionalId<Document>) => {
-        try {
-            await save(v)
-        } catch (error) {
-            saveCount++
+export function start() {
+    schedule.scheduleJob("00 00 06 * * *", () => {
+        let count = 0
+        let saveCount = 0
+        let s = async (v: OptionalId<Document>) => {
+            try {
+                await save(v)
+            } catch (error) {
+                saveCount++
 
-            if (saveCount <= MAX_RETRIES) {
-                await s(v)
+                if (saveCount <= MAX_RETRIES) {
+                    await s(v)
+                }
             }
         }
-    }
-    let d = async () => {
-        let info: any
+        let d = async () => {
+            let info: any
 
-        try {
-            info = await download()
-        } catch (error) {
-            count++
+            try {
+                info = await download()
+            } catch (error) {
+                count++
 
-            if (count <= MAX_RETRIES) {
-                d()
+                if (count <= MAX_RETRIES) {
+                    d()
+                }
+
+                return
             }
 
-            return
+            if (info) {
+                await s(info)
+            }
         }
 
-        if (info) {
-            await s(info)
-        }
-    }
-
-    d()
-})
+        d()
+    })
+}
 
 async function download() {
     try {
