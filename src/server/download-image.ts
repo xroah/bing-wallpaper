@@ -1,6 +1,5 @@
 import https from "https"
 import {load} from "cheerio"
-import path from "path"
 import fs from "fs"
 
 export const HOST = "https://cn.bing.com"
@@ -48,7 +47,7 @@ function getDir() {
     const baseDir = `${process.env["HOME"] || "/"}BingPic`
     const date = new Date()
     const dateDir = `/${date.getFullYear()}/${padZero(date.getMonth() + 1)}`
-    const downloadDir = path.join(baseDir, dateDir)
+    const downloadDir = `${baseDir}${dateDir}`
 
     if (!fs.existsSync(downloadDir)) {
         fs.mkdirSync(downloadDir, {recursive: true})
@@ -77,8 +76,8 @@ export function parse(html: string) {
         imageName: filename,
         thumbnailName,
         thumbnailLink: imageLink.replace(reg, THUMBNAIL_RESOLUTION),
-        imagePath: path.normalize(path.join(dir, filename)),
-        thumbnailPath: path.normalize(path.join(dir, thumbnailName)),
+        imagePath: `${dir}/${filename}`,
+        thumbnailPath: `${dir}/${thumbnailName}`,
         title: `${title} (${copyright})`,
         headline,
         date: getDateString()

@@ -55,17 +55,22 @@ export function start() {
 async function download() {
     try {
         const html = await request(HOST)
-        const info = parse(html.toString())
+        const {
+            imageLink,
+            thumbnailLink,
+            ...info
+        } = parse(html.toString())
 
-        await downloadImage(info.imageLink, info.imagePath)
-        await downloadImage(info.thumbnailLink, info.thumbnailPath)
-        console.log(info)
+        await downloadImage(imageLink, info.imagePath)
+        await downloadImage(thumbnailLink, info.thumbnailPath)
 
         return info
     } catch (error) {
         return false
     }
 }
+
+download()
 
 async function save(data: OptionalId<Document>) {
     const client = new MongoClient("mongodb://localhost:27017")
