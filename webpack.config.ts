@@ -39,7 +39,8 @@ export default function genConf(env: {prod?: boolean}) {
         },
         plugins: [
             new HTMLWebpackPlugin({
-                template: "./index.html",
+                template: "./public/index.html",
+                favicon: "./public/logo.png",
                 inject: "body",
                 hash: true
             })

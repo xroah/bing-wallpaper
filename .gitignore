@@ -4,3 +4,4 @@
 .vs
 Debug
 dist
+.DS_Store
