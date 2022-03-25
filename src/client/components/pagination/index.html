@@ -1,7 +1,7 @@
 <div class="root">
     <nav></nav>
     <div class="go-wrapper">
-        <span>跳转至</span>
+        <span>转至</span>
         <input class="input" />
         <span>页</span>
         <btn-comp size="sm" class="go">确定</btn-comp>
@@ -24,6 +24,7 @@
     .page-link {
         position: relative;
         display: block;
+        padding: .375rem .75rem;
         color: var(--primary-color);
         text-decoration: none;
         background-color: #fff;
@@ -70,10 +71,6 @@
         border-color: #dee2e6;
     }
 
-    .page-link {
-        padding: 0.375rem 0.75rem;
-    }
-
     .page-item:first-child .page-link {
         border-top-left-radius: 0.25rem;
         border-bottom-left-radius: 0.25rem;
@@ -85,17 +82,19 @@
     }
 
     .go-wrapper {
-        margin: 0 10px;
+        display: flex;
+        align-items: center;
+        margin: 0 .75rem;
         color: #999;
     }
 
     .go-wrapper .input {
         margin: 0 5px;
         width: 50px;
-        padding: 5px;
+        padding: 0.375rem .5rem;
         border: 1px solid #ccc;
         box-sizing: border-box;
-        border-radius: 3px;
+        border-radius: .25rem;
         outline: none;
         transition: all .15s;
     }
@@ -106,6 +105,16 @@
     }
 
     .go-wrapper .go {
-        margin-left: 5px;
+        margin-left: .5rem;
+    }
+
+    @media screen and (max-width: 550px) {
+        .page-link {
+            padding: .25rem .5rem;
+        }
+
+        .go-wrapper {
+            display: none;
+        }
     }
 </style>
