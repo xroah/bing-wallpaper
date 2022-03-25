@@ -1,8 +1,10 @@
 import https from "https"
 import {load} from "cheerio"
 import fs from "fs"
+import path from "path"
 
 export const HOST = "https://cn.bing.com"
+export const BASE = process.env["HOME"] || "/"
 
 function padZero(n: number) {
     return String(100 + n).substring(1)
@@ -44,40 +46,46 @@ export function request(url: string): Promise<Buffer> {
 }
 
 function getDir() {
-    const baseDir = `${process.env["HOME"] || "/"}BingPic`
+    const baseDir = `/BingPic`
     const date = new Date()
     const dateDir = `/${date.getFullYear()}/${padZero(date.getMonth() + 1)}`
-    const downloadDir = `${baseDir}${dateDir}`
+    const relDir = `${baseDir}${dateDir}`
+    const imgDir = path.join(BASE, relDir)
 
-    if (!fs.existsSync(downloadDir)) {
-        fs.mkdirSync(downloadDir, {recursive: true})
+    return {
+        imgDir,
+        relDir
     }
-
-    return downloadDir
 }
 
 export function parse(html: string) {
     const reg = /\d+x\d+/g
     const THUMBNAIL_RESOLUTION = "400x240"
+    const IMG_RESOLUTION = "1920x1200"
     const $ = load(html)
     const card = $(".musCard")
-    const downloadLink = card.find(".downloadLink").attr("href")
+    const downloadLink = card.
+        find(".downloadLink").
+        attr("href")!.
+        replace(reg, IMG_RESOLUTION)
     const title = card.find(".title").text()
     const copyright = card.find(".copyright").text()
     const headline = card.find(".headline .text").text()
     const imageLink = `${HOST}${downloadLink}`
     const urlObj = new URL(imageLink)
-    const filename = urlObj.searchParams.get("id")!
-    const thumbnailName = filename.replace(reg, THUMBNAIL_RESOLUTION)
-    const dir = getDir()
+    const imageName = urlObj.searchParams.get("id")!
+    const thumbnailName = imageName.replace(reg, THUMBNAIL_RESOLUTION)
+    const {imgDir, relDir} = getDir()
 
     return {
         imageLink,
-        imageName: filename,
+        imageName,
         thumbnailName,
         thumbnailLink: imageLink.replace(reg, THUMBNAIL_RESOLUTION),
-        imagePath: `${dir}/${filename}`,
-        thumbnailPath: `${dir}/${thumbnailName}`,
+        imagePath: `${relDir}/${imageName}`,
+        thumbnailPath: `${relDir}/${thumbnailName}`,
+        imageDownloadPath: `${imgDir}/${imageName}`,
+        thumbnailDownloadPath: `${imgDir}/${thumbnailName}`,
         title: `${title} (${copyright})`,
         headline,
         date: getDateString()
@@ -85,6 +93,11 @@ export function parse(html: string) {
 }
 
 export async function downloadImage(url: string, filePath: string) {
+    const {dir} = path.parse(filePath)
+
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, {recursive: true})
+    }
     try {
         let data = await request(url)
 

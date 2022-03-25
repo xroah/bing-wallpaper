@@ -58,19 +58,21 @@ async function download() {
         const {
             imageLink,
             thumbnailLink,
+            imageDownloadPath,
+            thumbnailDownloadPath,
             ...info
         } = parse(html.toString())
 
-        await downloadImage(imageLink, info.imagePath)
-        await downloadImage(thumbnailLink, info.thumbnailPath)
-
+        await downloadImage(imageLink, imageDownloadPath)
+        await downloadImage(thumbnailLink, thumbnailDownloadPath)
+        
         return info
     } catch (error) {
+        console.log(error)
+
         return false
     }
 }
-
-download()
 
 async function save(data: OptionalId<Document>) {
     const client = new MongoClient("mongodb://localhost:27017")
