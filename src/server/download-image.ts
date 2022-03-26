@@ -76,6 +76,7 @@ export function parse(html: string) {
     const imageName = urlObj.searchParams.get("id")!
     const thumbnailName = imageName.replace(reg, THUMBNAIL_RESOLUTION)
     const {imgDir, relDir} = getDir()
+    const dateString = getDateString()
 
     return {
         imageLink,
@@ -88,7 +89,8 @@ export function parse(html: string) {
         thumbnailDownloadPath: `${imgDir}/${thumbnailName}`,
         title: `${title} (${copyright})`,
         headline,
-        date: getDateString()
+        date: dateString,
+        timestamp: new Date(`${dateString} 00:00:00`).getTime()
     }
 }
 

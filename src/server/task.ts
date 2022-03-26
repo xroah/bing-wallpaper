@@ -65,7 +65,7 @@ async function download() {
 
         await downloadImage(imageLink, imageDownloadPath)
         await downloadImage(thumbnailLink, thumbnailDownloadPath)
-        
+
         return info
     } catch (error) {
         console.log(error)
