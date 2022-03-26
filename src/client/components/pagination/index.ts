@@ -9,6 +9,8 @@ const PAGE_CHANGE_EVENT = "pagechange"
 class Pagination extends HTMLElement {
     private _nav: HTMLElement
     private _el: HTMLUListElement | null = null
+    private _input: HTMLInputElement
+    private _go: HTMLButtonElement
     private _total = 0
     private _totalPages = 0
     private _current = 1
@@ -24,6 +26,9 @@ class Pagination extends HTMLElement {
         const shadow = this.attachShadow({mode: "open"})
         shadow.innerHTML = template
         this._nav = shadow.querySelector("nav")!
+        this._input = shadow.querySelector(".input")!
+        this._go = shadow.querySelector(".go")!
+
         this._ellipsis.classList.add(DISABLE_CLASS)
     }
 
@@ -31,6 +36,7 @@ class Pagination extends HTMLElement {
         const total = Number.parseInt(this.getAttribute("total") || "")
         const size = Number.parseInt(this.getAttribute("size") || "")
         const current = Number.parseInt(this.getAttribute("current") || "")
+        const {_input} = this
 
         if (total) {
             this.total = total
@@ -47,13 +53,21 @@ class Pagination extends HTMLElement {
         this._connected = true
 
         this._nav.addEventListener("click", this.handleClick)
+        _input.addEventListener("focusout", this.handleFocusOut)
+        _input.addEventListener("keydown", this.handleKeyDown)
+        this._go.addEventListener("click", this.handleGo)
+
         this.render()
     }
 
     disconnectedCallback() {
+        const {_input} = this
         this._connected = false
 
         this._nav.removeEventListener("click", this.handleClick)
+        _input.removeEventListener("keydown", this.handleKeyDown)
+        _input.removeEventListener("focusout", this.handleFocusOut)
+        this._go.removeEventListener("click", this.handleGo)
     }
 
     setAttribute(qualifiedName: string, value: string): void {
@@ -72,6 +86,51 @@ class Pagination extends HTMLElement {
         }
 
         this.render()
+    }
+
+    parseInput(v: string) {
+        let page = Number.parseInt(v.trim())
+        let ret = 1
+
+        if (page) {
+            if (page <= 0) {
+                ret = 1
+            } else if (page > this.totalPages) {
+                ret = this.totalPages
+            } else {
+                ret = page
+            }
+        }
+
+        return ret
+    }
+
+    handleKeyDown = (evt: KeyboardEvent) => {
+        if (evt.key.toLowerCase() === "enter") {
+            this.to(this.resetInputValue())
+        }
+    }
+
+    handleFocusOut = () => {
+        this.resetInputValue()
+    }
+
+    handleGo = () => {
+        const value = this._input.value.trim()
+
+        if (!value) {
+            return
+        }
+
+        this.to(this.resetInputValue())
+    }
+
+    resetInputValue() {
+        const {_input} = this
+        const page = this.parseInput(_input.value)
+        _input.value = String(page)
+
+        return page
     }
 
     handleClick = (evt: MouseEvent) => {
