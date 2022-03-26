@@ -1,3 +1,4 @@
+import template from "./svg.html"
 import {defineEl} from "../../utils"
 
 export default class SVG extends HTMLElement {
@@ -7,17 +8,7 @@ export default class SVG extends HTMLElement {
         super()
 
         const shadow = this.attachShadow({mode: "open"})
-        shadow.innerHTML = `
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-                fill="none" 
-                strokeWidth="2" 
-                strokeLinecap="round"
-                strokeLinejoin="round">
-            </svg>
-        `
+        shadow.innerHTML = template
         this.svg = shadow.querySelector("svg")!
     }
 
