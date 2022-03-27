@@ -1,4 +1,8 @@
-import express from "express"
+import express,
+{
+    Response,
+    NextFunction
+} from "express"
 import fs from "fs"
 import path from "path"
 import {BASE_DIR} from "../download-image"
@@ -9,10 +13,11 @@ router.get("/", (_, res) => {
     res.send("Download")
 })
 
-router.get("/image", (req, res, next) => {
-    const {query} = req
-    const img = query["img"]
-
+function downloadImage(
+    img: string,
+    res: Response,
+    next: NextFunction
+) {
     if (!img) {
         res.json({
             code: 1,
@@ -24,7 +29,10 @@ router.get("/image", (req, res, next) => {
 
     const imgPath = path.join(BASE_DIR, img as string)
 
-    if (!fs.existsSync(imgPath)) {
+    if (
+        !fs.existsSync(imgPath) ||
+        fs.statSync(imgPath).isDirectory()
+    ) {
         res.json({
             code: 404,
             msg: "文件不存在"
@@ -45,6 +53,14 @@ router.get("/image", (req, res, next) => {
 
             res.end()
         }
+    )
+}
+
+router.get("/image", (req, res, next) => {
+    downloadImage(
+        req.query["img"] as string,
+        res,
+        next
     )
 })
 
