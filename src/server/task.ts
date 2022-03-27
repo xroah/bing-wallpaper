@@ -13,45 +13,6 @@ import {
 
 let MAX_RETRIES = 10
 
-export function start() {
-    schedule.scheduleJob("00 00 06 * * *", () => {
-        let count = 0
-        let saveCount = 0
-        let s = async (v: OptionalId<Document>) => {
-            try {
-                await save(v)
-            } catch (error) {
-                saveCount++
-
-                if (saveCount <= MAX_RETRIES) {
-                    await s(v)
-                }
-            }
-        }
-        let d = async () => {
-            let info: any
-
-            try {
-                info = await download()
-            } catch (error) {
-                count++
-
-                if (count <= MAX_RETRIES) {
-                    d()
-                }
-
-                return
-            }
-
-            if (info) {
-                await s(info)
-            }
-        }
-
-        d()
-    })
-}
-
 async function download() {
     try {
         const html = await request(HOST)
@@ -92,4 +53,45 @@ async function save(data: OptionalId<Document>) {
             await conn.close()
         }
     }
+}
+
+function execTask() {
+    let count = 0
+    let saveCount = 0
+    let s = async (v: OptionalId<Document>) => {
+        try {
+            await save(v)
+        } catch (error) {
+            saveCount++
+
+            if (saveCount <= MAX_RETRIES) {
+                await s(v)
+            }
+        }
+    }
+    let d = async () => {
+        let info: any
+
+        try {
+            info = await download()
+        } catch (error) {
+            count++
+
+            if (count <= MAX_RETRIES) {
+                d()
+            }
+
+            return
+        }
+
+        if (info) {
+            await s(info)
+        }
+    }
+
+    d()
+}
+
+export function start() {
+    schedule.scheduleJob("00 00 06 * * *", execTask)
 }

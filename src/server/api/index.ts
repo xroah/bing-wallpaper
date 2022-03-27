@@ -16,16 +16,23 @@ function getPositiveInt(v: string, defaultValue?: number) {
     return intV
 }
 
+function getTime(date: string) {
+    const d = new Date(`${date} 00:00:00`)
+
+    return d.getTime()
+}
+
 /**
  * query:
  * 
  * page: current page
  * size: page size
- * startDate: start date
- * endDate: end date
+ * startDate: start date(like: 2022-03-26)
+ * endDate: end date, same as startDate
  */
 app.get("/images", async (req, res, next) => {
     const {query} = req
+    const {startDate, endDate} = query as any
     let page = getPositiveInt(
         query["page"] as string,
         DEFAULT_PAGE
@@ -36,16 +43,20 @@ app.get("/images", async (req, res, next) => {
     )
     let $and: Filter<Document>[] = []
     let filter: Filter<Document> = {}
-        
-    if (query["startDate"]) {
+
+    if (startDate) {
         $and.push({
-            date: {$gte: query["startDate"]}
+            timestamp: {
+                $gte: getTime(startDate)
+            }
         })
     }
 
-    if (query["endDate"]) {
+    if (endDate) {
         $and.push({
-            date: {$lte: query["endDate"]}
+            timestamp: {
+                $lte: getTime(endDate)
+            }
         })
     }
 
@@ -64,7 +75,16 @@ app.get("/images", async (req, res, next) => {
         }
 
         const list = await coll
-            .find(filter)
+            .find(
+                filter,
+                {
+                    projection: {
+                        _id: 0,
+                        timestamp: 0
+                    }
+                }
+            )
+            .sort({timestamp: -1})
             .skip((page - 1) * size)
             .limit(size)
             .toArray()
