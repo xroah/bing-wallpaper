@@ -1,8 +1,9 @@
 import express from "express"
 import {Filter, Document} from "mongodb"
 import {coll} from "../db"
+import downloadRouter from "./download"
 
-const app = express()
+const router = express.Router()
 const DEFAULT_SIZE = 12
 const DEFAULT_PAGE = 1
 
@@ -22,6 +23,10 @@ function getTime(date: string) {
     return d.getTime()
 }
 
+router.get("/", (_, res) => {
+    res.send("API")
+})
+
 /**
  * query:
  * 
@@ -30,7 +35,7 @@ function getTime(date: string) {
  * startDate: start date(like: 2022-03-26)
  * endDate: end date, same as startDate
  */
-app.get("/images", async (req, res, next) => {
+router.get("/images", async (req, res, next) => {
     const {query} = req
     const {startDate, endDate} = query as any
     let page = getPositiveInt(
@@ -102,4 +107,6 @@ app.get("/images", async (req, res, next) => {
     }
 })
 
-export default app
+router.use("/download", downloadRouter)
+
+export default router

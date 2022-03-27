@@ -7,6 +7,7 @@ import {start as startTask} from "./task"
 import ApiApp from "./api"
 import {connect} from "./db"
 import path from "path"
+import {BASE_DIR, IMAGE_DIR} from "./download-image"
 
 connect(
     () => {
@@ -18,9 +19,9 @@ connect(
         })
 
         if (env["NODE_ENV"] === "development") {
-            const imgDir = path.join(env["HOME"] || "/", "/BingPic")
+            const imgDir = path.join(BASE_DIR, IMAGE_DIR)
 
-            app.use("/images/BingPic", express.static(imgDir))
+            app.use(`/images/${IMAGE_DIR}`, express.static(imgDir))
         }
 
         app.use("/api", ApiApp)

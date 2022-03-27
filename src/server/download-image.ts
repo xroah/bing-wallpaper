@@ -4,7 +4,8 @@ import fs from "fs"
 import path from "path"
 
 export const HOST = "https://cn.bing.com"
-export const BASE = process.env["HOME"] || "/"
+export const BASE_DIR = process.env["HOME"] || "/"
+export const IMAGE_DIR = "/BingPic"
 
 function padZero(n: number) {
     return String(100 + n).substring(1)
@@ -46,11 +47,10 @@ export function request(url: string): Promise<Buffer> {
 }
 
 function getDir() {
-    const baseDir = `/BingPic`
     const date = new Date()
     const dateDir = `/${date.getFullYear()}/${padZero(date.getMonth() + 1)}`
-    const relDir = `${baseDir}${dateDir}`
-    const imgDir = path.join(BASE, relDir)
+    const relDir = `${IMAGE_DIR}${dateDir}`
+    const imgDir = path.join(BASE_DIR, relDir)
 
     return {
         imgDir,
