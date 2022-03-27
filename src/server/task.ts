@@ -1,15 +1,12 @@
 import schedule from "node-schedule"
-import {
-    Document,
-    MongoClient,
-    OptionalId
-} from "mongodb"
+import {Document, OptionalId} from "mongodb"
 import {
     downloadImage,
     HOST,
     parse,
     request
 } from "./download-image"
+import {connect} from "./db"
 
 let MAX_RETRIES = 10
 
@@ -36,23 +33,14 @@ async function download() {
 }
 
 async function save(data: OptionalId<Document>) {
-    const client = new MongoClient("mongodb://localhost:27017")
-    let conn: MongoClient | undefined
-
-    try {
-        conn = await client.connect()
-
-        await conn
-            .db("bing-pic")
-            .collection("images")
-            .insertOne(data)
-
-        await conn.close()
-    } catch (error) {
-        if (conn) {
-            await conn.close()
+    connect(
+        (_, c, close) => {
+            c
+                .insertOne(data)
+                .then(close)
+                .catch(close)
         }
-    }
+    )
 }
 
 function execTask() {
