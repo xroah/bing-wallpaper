@@ -14,17 +14,21 @@ connect(
         const app = express()
         const env = process.env
 
-        app.get("/", (_, res) => {
-            res.send("Hello")
-        })
-
         if (env["NODE_ENV"] === "development") {
             const imgDir = path.join(BASE_DIR, IMAGE_DIR)
 
+            app.use((_, res, next) => {
+                res.set("Access-Control-Allow-Origin", "*")
+                next()
+            })
             app.use(`/images/${IMAGE_DIR}`, express.static(imgDir))
         }
 
+        app.get("/", (_, res) => {
+            res.send("Hello")
+        })
         app.use("/api", ApiApp)
+        // error handler
         app.use(
             (
                 err: Error,
