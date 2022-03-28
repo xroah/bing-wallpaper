@@ -28,11 +28,10 @@ export default function genConf(env: {prod?: boolean}) {
                     use: "ts-loader"
                 },
                 {
-                    test: /\.s?css$/,
+                    test: /\.css$/,
                     use: [
                         isProd ? MiniCSSExtractPlugin.loader : "style-loader",
-                        "css-loader",
-                        "sass-loader"
+                        "css-loader"
                     ]
                 }
             ]

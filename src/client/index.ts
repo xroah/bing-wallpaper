@@ -4,4 +4,4 @@ import "./components/button"
 import "./components/icons/icons"
 import "./components/card"
 
-import "./index.scss"
+import "./index.css"
