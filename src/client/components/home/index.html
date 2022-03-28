@@ -1,8 +1,41 @@
-<div>
-    Main component
-    <download-icon></download-icon>
-    <chevron-right-icon></chevron-right-icon>
-    <chevron-left-icon></chevron-left-icon>
-    <github-icon></github-icon>
+<div class="container">
+    <div class="image-list">
+        
+    </div>
     <pagination-comp total="537"></pagination-comp>
 </div>
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .image-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .image-list card-comp {
+        min-width: 0;
+    }
+
+    @media screen and (min-width: 800px) and (max-width: 1000px) {
+        .image-list {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media screen and (min-width: 500px) and (max-width: 800px) {
+        .image-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media screen and (max-width: 500px) {
+        .image-list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

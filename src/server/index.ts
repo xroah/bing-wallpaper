@@ -21,7 +21,7 @@ connect(
                 res.set("Access-Control-Allow-Origin", "*")
                 next()
             })
-            app.use(`/images${IMAGE_DIR}`, express.static(imgDir))
+            app.use(IMAGE_DIR, express.static(imgDir))
         }
 
         app.get("/", (_, res) => {
