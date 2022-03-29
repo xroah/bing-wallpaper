@@ -50,7 +50,11 @@ export default function genConf(env: {prod?: boolean}) {
         cfg.devServer = {
             port: 8000,
             open: true,
-            hot: true
+            hot: true,
+            proxy: [{
+                context: ["/api", "/BingPic"],
+                target: "http://localhost:3000"
+            }]
         } as ServerConf
     } else {
         cfg.plugins!.push(
