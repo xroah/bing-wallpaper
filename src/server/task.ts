@@ -6,7 +6,7 @@ import {
     parse,
     request
 } from "./download-image"
-import {connect} from "./db"
+import {coll} from "./db"
 
 let MAX_RETRIES = 10
 
@@ -33,23 +33,22 @@ async function download() {
 }
 
 async function save(data: OptionalId<Document>) {
-    connect(
-        (_, c, close) => {
-            c
-                .insertOne(data)
-                .then(close)
-                .catch(close)
-        }
-    )
+    try {
+        await coll.insertOne(data)
+
+        return false
+    } catch (error) {
+        return true
+    }
 }
 
 function execTask() {
     let count = 0
     let saveCount = 0
     let s = async (v: OptionalId<Document>) => {
-        try {
-            await save(v)
-        } catch (error) {
+        const ret = await save(v)
+
+        if (!ret) {
             saveCount++
 
             if (saveCount <= MAX_RETRIES) {
@@ -58,22 +57,16 @@ function execTask() {
         }
     }
     let d = async () => {
-        let info: any
+        let info = await download()
 
-        try {
-            info = await download()
-        } catch (error) {
+        if (info) {
+            await s(info)
+        } else {
             count++
 
             if (count <= MAX_RETRIES) {
                 d()
             }
-
-            return
-        }
-
-        if (info) {
-            await s(info)
         }
     }
 
