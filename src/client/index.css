@@ -4,6 +4,7 @@
 
 body {
     margin: 0;
+    color: var(--body-color);
     font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC",
         "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",
         sans-serif;
@@ -11,6 +12,7 @@ body {
 
 :root {
     font-size: 14px;
+    --body-color: #212529;
     --primary-color: #0d6efd;
     --primary-focus-color: #0a58ca;
     --focus-box-shadow: 0 0 0.25rem 0 rgba(13, 110, 253, 0.5);

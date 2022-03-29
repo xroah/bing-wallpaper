@@ -1,12 +1,52 @@
+<header>
+    <div class="container">
+        <div class="logo-wrapper">
+            <img src="../../../../public/logo.png" />
+            <span>必应每日图片</span>
+        </div>
+        <a href="https://github.com/xroah/bing-pic">
+            <github-icon size="32"></github-icon>
+        </a>
+    </div>
+</header>
 <div class="container">
     <div class="image-list">
-        
     </div>
-    <pagination-comp total="537"></pagination-comp>
+    <pagination-comp class="pagination"></pagination-comp>
 </div>
 <style>
+    header {
+        padding: .5rem;
+        margin-bottom: 2rem;
+        background-color: var(--body-color);
+        color: #fff;
+        font-size: 1.8rem;
+    }
+
+    header .container {
+        display: flex;
+        align-items: center;
+    }
+    
+    header .logo-wrapper {
+        display: flex;
+        align-items: center;
+        margin-right: auto;
+    }
+
+    header img {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    header a {
+        padding-top: .3rem;
+        line-height: 1;
+        color: #fff;
+    }
+
     .container {
-        max-width: 1200px;
+        max-width: 1600px;
         margin: 0 auto;
         padding: 0 1rem;
     }
@@ -37,5 +77,19 @@
         .image-list {
             grid-template-columns: 1fr;
         }
+    }
+
+    .image-list .img-card {
+        transition: all .3s;
+    }
+
+    .image-list .img-card:hover {
+        box-shadow: 0 .2rem .5rem 0 rgba(0, 0, 0, .2);
+        transform: translateY(-.5rem);
+    }
+
+    .pagination {
+        display: block;
+        margin: 2rem 0;
     }
 </style>

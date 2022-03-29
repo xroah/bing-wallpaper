@@ -1,9 +1,11 @@
 import {defineEl} from "../../utils"
 import {Card} from "../card"
+import {Pagination} from "../pagination"
 import template from "./index.html"
 
 class Main extends HTMLElement {
     private _listEl: HTMLElement
+    private _pageEl: Pagination
 
     constructor() {
         super()
@@ -11,6 +13,7 @@ class Main extends HTMLElement {
         const shadow = this.attachShadow({mode: "open"})
         shadow.innerHTML = template
         this._listEl = shadow.querySelector(".image-list")!
+        this._pageEl = shadow.querySelector(".pagination")!
     }
 
     connectedCallback() {
@@ -19,28 +22,30 @@ class Main extends HTMLElement {
     }
 
     fetchImages() {
-        fetch("http://localhost:3000/api/images")
+        fetch("/api/images")
             .then(res => {
                 return res.json()
             })
             .then(json => {
-                const list = json.data.list
+                const {list, total} = json.data
                 const frag = document.createDocumentFragment()
-                
+
                 list.forEach((item: any) => {
                     const card = <Card>document.createElement("card-comp")
 
-                    card.highResolutionSrc = `http://localhost:3000${item.imagePath}`
-                    card.img = `http://localhost:3000${item.imagePath}`
+                    card.highResolutionSrc = item.imagePath
+                    card.img = item.thumbnailPath
                     card.date = item.date
                     card.headline = item.headline
                     card.info = item.title
-                    
+
+                    card.classList.add("img-card")
                     frag.append(card)
                 })
 
                 this._listEl.append(frag)
-                console.log(list)
+                this._pageEl.total = total
+                console.log(total)
             })
     }
 }

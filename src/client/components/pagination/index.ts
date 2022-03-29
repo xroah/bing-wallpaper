@@ -6,7 +6,7 @@ const ACTIVE_CLASS = "active"
 const DISABLE_CLASS = "disabled"
 const PAGE_CHANGE_EVENT = "pagechange"
 
-class Pagination extends HTMLElement {
+export class Pagination extends HTMLElement {
     private _nav: HTMLElement
     private _el: HTMLUListElement | null = null
     private _input: HTMLInputElement
