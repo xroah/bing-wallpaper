@@ -72,8 +72,8 @@ router.get("/images", async (req, res, next) => {
     }
 
     try {
-        const count = await coll.countDocuments(filter)
-        const pages = Math.ceil(count / size)
+        const total = await coll.countDocuments(filter)
+        const pages = Math.ceil(total / size)
 
         if (pages > 0 && page > pages) {
             page = pages
@@ -97,7 +97,7 @@ router.get("/images", async (req, res, next) => {
         res.json({
             code: 0,
             data: {
-                count,
+                total,
                 pages,
                 list
             }
