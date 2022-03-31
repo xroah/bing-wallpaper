@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve",
-    "build": "webpack --env prod"
+    "build": "webpack --env prod",
+    "server": "nodemon ./src/server/dev.ts"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.0",
+    "nodemon": "^2.0.15",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.7.0",
