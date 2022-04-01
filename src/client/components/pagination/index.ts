@@ -78,11 +78,9 @@ export class Pagination extends HTMLElement {
 
     updateTotalPages() {
         this._totalPages = Math.ceil(this.total / this._size)
-        
+
         if (this.current > this._totalPages) {
             this.current = this._totalPages
-
-            this.emit()
         }
 
         this.render()
@@ -112,7 +110,9 @@ export class Pagination extends HTMLElement {
     }
 
     handleFocusOut = () => {
-        this.resetInputValue()
+        if (this._input.value.trim()) {
+            this.resetInputValue()
+        }
     }
 
     handleGo = () => {
@@ -127,8 +127,9 @@ export class Pagination extends HTMLElement {
 
     resetInputValue() {
         const {_input} = this
+
         const page = this.parseInput(_input.value)
-        _input.value = String(page)
+        _input.value = String(page || 1)
 
         return page
     }
@@ -276,7 +277,8 @@ export class Pagination extends HTMLElement {
             prev.classList.add("disabled")
         }
 
-        if (this.current === this.totalPages) {
+        // total maybe 0
+        if (this.current >= this.totalPages) {
             next.classList.add("disabled")
         }
 
