@@ -80,5 +80,4 @@ export function alert(msg: string) {
 
 defineEl("modal-comp", Modal)
 
-// @ts-ignore
 window.showAlert = alert
