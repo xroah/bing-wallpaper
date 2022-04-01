@@ -4,6 +4,8 @@ export function defineEl(name: string, ctor: new () => HTMLElement) {
     }
 }
 
+export const TIMEOUT = 300
+
 export function executeAfterTransition(
     el: HTMLElement,
     timeout: number,

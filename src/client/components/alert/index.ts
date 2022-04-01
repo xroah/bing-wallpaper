@@ -1,4 +1,8 @@
-import {defineEl, executeAfterTransition} from "../../utils"
+import {
+    defineEl,
+    TIMEOUT,
+    executeAfterTransition
+} from "../../utils"
 import {Backdrop} from "../backdrop"
 import template from "./index.html"
 
@@ -6,7 +10,7 @@ export class Modal extends HTMLElement {
     private _ok: HTMLButtonElement
     private _body: HTMLElement
     private _msg: string = ""
-    public el: HTMLElement
+    private _el: HTMLElement
 
     constructor() {
         super()
@@ -15,7 +19,7 @@ export class Modal extends HTMLElement {
         shadow.innerHTML = template
         this._ok = shadow.querySelector(".ok")!
         this._body = shadow.querySelector(".modal-body")!
-        this.el = shadow.querySelector(".modal")!
+        this._el = shadow.querySelector(".modal")!
     }
 
     connectedCallback() {
@@ -36,6 +40,44 @@ export class Modal extends HTMLElement {
         this.dispatchEvent(new CustomEvent("ok"))
     }
 
+    handleKeydown = (evt: KeyboardEvent) => {
+        if (/^esc/.test(evt.key.toLowerCase())) {
+            this.hide()
+        }
+    }
+
+    show() {
+        const {_el: el} = this
+
+        el.style.display = "block"
+        el.offsetHeight
+        el.classList.add("show")
+        el.addEventListener("keydown", this.handleKeydown)
+
+        executeAfterTransition(
+            el,
+            TIMEOUT,
+            () => {
+                this.dispatchEvent(new CustomEvent("modalshown"))
+                el.focus()
+            }
+        )
+    }
+
+    hide() {
+        const {_el: el} = this
+
+        el.classList.remove("show")
+        el.removeEventListener("keydown", this.handleKeydown)
+        executeAfterTransition(
+            el,
+            TIMEOUT,
+            () => {
+                this.dispatchEvent(new CustomEvent("modalhidden"))
+            }
+        )
+    }
+
     set msg(v: string) {
         this._msg = v
         this._body.innerHTML = v
@@ -49,32 +91,26 @@ export class Modal extends HTMLElement {
 export function alert(msg: string) {
     const modal = <Modal>document.createElement("modal-comp")
     const backdrop = <Backdrop>document.createElement("backdrop-comp")
-    const {el} = modal
     const close = () => {
-        executeAfterTransition(
-            el,
-            300,
-            () => {
-                modal.remove()
-                backdrop.remove()
-            }
-        )
-
-        el.classList.remove("show")
+        modal.hide()
         backdrop.hide()
     }
+    const onHidden = () => {
+        backdrop.remove()
+        modal.remove()
+    }
+    const once = true
     modal.msg = msg
 
     document.body.append(backdrop)
     document.body.append(modal)
     backdrop.show()
-    el.style.display = "block"
-    el.offsetHeight
-    el.classList.add("show")
+    modal.show()
 
-    modal.addEventListener("ok", close, {once: true})
-    backdrop.addEventListener("click", close, {once: true})
-    
+    modal.addEventListener("ok", close, {once})
+    backdrop.addEventListener("click", close, {once})
+    modal.addEventListener("modalhidden", onHidden, {once})
+
     return close
 }
 
