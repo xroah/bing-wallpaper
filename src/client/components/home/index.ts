@@ -1,3 +1,4 @@
+import {get} from "../../request"
 import {defineEl} from "../../utils"
 import {Card} from "../card"
 import {Pagination} from "../pagination"
@@ -6,6 +7,7 @@ import template from "./index.html"
 class Main extends HTMLElement {
     private _listEl: HTMLElement
     private _pageEl: Pagination
+    private _page = 1
 
     constructor() {
         super()
@@ -22,12 +24,9 @@ class Main extends HTMLElement {
     }
 
     fetchImages() {
-        fetch("/api/images")
-            .then(res => {
-                return res.json()
-            })
-            .then(json => {
-                const {list, total} = json.data
+        get(`/api/images?page=${this._page}`)
+            .then((data: any) => {
+                const {list, total} = data
                 const frag = document.createDocumentFragment()
 
                 list.forEach((item: any) => {
