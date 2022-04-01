@@ -5,5 +5,6 @@ import "./components/icons/icons"
 import "./components/card"
 import "./components/alert"
 import "./components/backdrop"
+import "./components/message"
 
 import "./index.css"
