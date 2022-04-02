@@ -19,7 +19,13 @@ interface Message {
     closeAll: ReturnVoid
 }
 
+interface Loading {
+    show: ReturnVoid
+    hide: ReturnVoid
+}
+
 interface Window {
-    showAlert: (msg: string) => ReturnVoid
+    loading: Loading
     message: Message
+    showAlert: (msg: string) => ReturnVoid
 }

@@ -1,0 +1,32 @@
+<div class="loading-wrapper">
+    <span class="loading"></span>
+</div>
+<style>
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loading-wrapper {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate3d(-50%, -50%, 0);
+        padding: 1rem;
+        border-radius: .5rem;
+        background-color: rgba(0, 0, 0, .65);
+        color: #fff;
+    }
+
+    .loading {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: -0.125em;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: 0.75s linear infinite spin;
+    }
+</style>
