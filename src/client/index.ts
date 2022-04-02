@@ -1,4 +1,3 @@
-import "./components/home"
 import "./components/pagination"
 import "./components/button"
 import "./components/icons/icons"
@@ -7,5 +6,6 @@ import "./components/alert"
 import "./components/backdrop"
 import "./components/message"
 import "./components/loading"
+import "./components/home"
 
 import "./index.css"

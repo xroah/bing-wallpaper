@@ -4,7 +4,8 @@ import template from "./index.html"
 const VISIBLE_PAGES = 7
 const ACTIVE_CLASS = "active"
 const DISABLE_CLASS = "disabled"
-const PAGE_CHANGE_EVENT = "pagechange"
+
+export const PAGE_CHANGE_EVENT = "pagechange"
 
 export class Pagination extends HTMLElement {
     private _nav: HTMLElement
