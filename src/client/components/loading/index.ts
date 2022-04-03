@@ -1,17 +1,14 @@
 import {defineEl} from "../../utils"
 import template from "./index.html"
 
-defineEl(
-    "loading-comp",
-    class extends HTMLElement {
-        constructor() {
-            super()
+export class Loading extends HTMLElement {
+    constructor() {
+        super()
 
-            const shadow = this.attachShadow({mode: "open"})
-            shadow.innerHTML = template
-        }
+        const shadow = this.attachShadow({mode: "open"})
+        shadow.innerHTML = template
     }
-)
+}
 
 let current: HTMLElement | null = null
 
@@ -21,8 +18,7 @@ const loading = {
             return
         }
 
-        current = document.createElement("loading-comp")
-
+        current = new Loading()
         document.body.append(current)
     },
     hide() {
@@ -35,5 +31,7 @@ const loading = {
         current = null
     }
 }
+
+defineEl("loading-comp", Loading)
 
 window.loading = loading
