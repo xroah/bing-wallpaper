@@ -1,7 +1,7 @@
 import {defineEl} from "../../utils"
 import template from "./index.html"
 
-class Button extends HTMLElement {
+export class Button extends HTMLElement {
     constructor() {
         super()
 
