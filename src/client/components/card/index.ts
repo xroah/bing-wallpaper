@@ -54,7 +54,7 @@ export class Card extends HTMLElement {
         this._highResolutionSrc = v
     }
 
-    get hightResolutionSrc() {
+    get highResolutionSrc() {
         return this._highResolutionSrc
     }
 }

@@ -6,6 +6,7 @@ import "./components/alert"
 import "./components/backdrop"
 import "./components/message"
 import "./components/loading"
+import "./components/image-viewer"
 import "./components/home"
 
 import "./index.css"

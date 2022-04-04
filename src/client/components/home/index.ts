@@ -1,6 +1,7 @@
 import {get} from "../../request"
 import {defineEl} from "../../utils"
 import {Card} from "../card"
+import {viewImage} from "../image-viewer"
 import {Pagination, PAGE_CHANGE_EVENT} from "../pagination"
 import template from "./index.html"
 
@@ -8,6 +9,7 @@ class Main extends HTMLElement {
     private _listEl: HTMLElement
     private _pageEl: Pagination
     private _page = 1
+    private _images: string[] = []
 
     constructor() {
         super()
@@ -32,6 +34,7 @@ class Main extends HTMLElement {
             PAGE_CHANGE_EVENT,
             this.handlePageChange as any
         )
+        this._listEl.addEventListener("click", this.handleClickCard)
     }
 
     disconnectedCallback() {
@@ -41,9 +44,22 @@ class Main extends HTMLElement {
         )
     }
 
+    handleClickCard = (evt: MouseEvent) => {
+        const t = evt.target as Card
+        
+        if (t.localName === "card-comp") {
+            viewImage(
+                t.highResolutionSrc,
+                this._images,
+                evt.clientX,
+                evt.clientY
+            )
+        }
+    }
+
     handlePageChange = (evt: CustomEvent) => {
         const {page} = evt.detail
-        
+
         this._page = page
         location.hash = `page=${page}`
 
@@ -56,11 +72,11 @@ class Main extends HTMLElement {
         get(`/api/images?page=${this._page}`)
             .then((data: any) => {
                 const {list, total} = data
-                const  {_listEl, _pageEl} = this
+                const {_listEl, _pageEl} = this
                 const frag = document.createDocumentFragment()
                 _listEl.textContent = ""
 
-                list.forEach((item: any) => {
+                this._images = list.map((item: any) => {
                     const card = <Card>document.createElement("card-comp")
 
                     card.highResolutionSrc = item.imagePath
@@ -71,11 +87,13 @@ class Main extends HTMLElement {
 
                     card.classList.add("img-card")
                     frag.append(card)
+
+                    return item.imagePath
                 })
 
                 _listEl.append(frag)
                 _pageEl.total = total
-                
+
                 if (page) {
                     _pageEl.current = page
                 }
