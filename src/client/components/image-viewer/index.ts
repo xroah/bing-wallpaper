@@ -11,6 +11,8 @@ export class ImageViewer extends HTMLElement {
     private _bodyEl: HTMLElement
     private _index = -1
 
+    static viewer: ImageViewer
+
     constructor() {
         super()
 
@@ -181,6 +183,10 @@ export class ImageViewer extends HTMLElement {
 
 let viewer: ImageViewer | null = null
 
+function getScrollbarWidth() {
+    return window.innerWidth - document.documentElement.clientWidth    
+}
+
 export function viewImage(
     src: string,
     images: string[],
@@ -191,12 +197,19 @@ export function viewImage(
         return
     }
 
+    const {body} = document
     viewer = new ImageViewer()
     viewer.src = src
     viewer.images = images
     viewer.style.transformOrigin = `${x}px ${y}px`
+    const sw = getScrollbarWidth()
 
-    document.body.append(viewer)
+    if (sw > 0) {
+        body.style.paddingRight = `${sw}px`
+        body.style.overflow = "hidden"
+    }
+
+    body.append(viewer)
     viewer.show()
     viewer.addEventListener(
         "close",
@@ -216,6 +229,8 @@ export function removeViewer() {
         () => {
             viewer?.remove()
 
+            document.body.style.overflow = ""
+            document.body.style.paddingRight = ""
             viewer = null
         },
         {once: true}
