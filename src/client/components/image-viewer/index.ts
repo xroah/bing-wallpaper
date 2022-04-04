@@ -47,11 +47,13 @@ export class ImageViewer extends HTMLElement {
     private update() {
         const {_index, _images} = this
         const l = _images.length
-
+        
         if (_index > 0) {
             this._prevImgEl.src = _images[_index - 1]!
-        } else if (_index < l - 1) {
-            this._nextImgEl.src = _images[l - 1]!
+        }
+
+        if (_index < l - 1) {
+            this._nextImgEl.src = _images[_index + 1]!
         }
 
         this._currentImgEl.src = this._src
@@ -63,13 +65,12 @@ export class ImageViewer extends HTMLElement {
         }
 
         this._src = v
-        this._index = this.getIndex()
-
-        this.update()
     }
 
     set images(v: string[]) {
-        if (this._images = v) {
+        const {_images} = this
+
+        if (_images === v && _images.length === v.length) {
             return
         }
 
@@ -81,7 +82,7 @@ export class ImageViewer extends HTMLElement {
 
     show() {
         this.offsetHeight
-        
+
         this.classList.add("show")
         executeAfterTransition(
             this,
@@ -116,7 +117,7 @@ export function viewImage(
     if (viewer) {
         return
     }
-    
+
     viewer = new ImageViewer()
     viewer.src = src
     viewer.images = images
