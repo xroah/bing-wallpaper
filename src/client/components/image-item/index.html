@@ -1,0 +1,25 @@
+<div>
+    <img class="not-loaded" />
+    <loading-comp></loading-comp>
+</div>
+<style>
+    div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        transition: transform .3s;
+    }
+
+    img.not-loaded {
+        transform: scale(0);
+    }
+</style>
