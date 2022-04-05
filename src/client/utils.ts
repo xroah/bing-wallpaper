@@ -38,3 +38,12 @@ export function executeAfterTransition(
 
     el.addEventListener("transitionend", cb, {once: true})
 }
+
+export function downloadImage(url: string) {
+    const name = url.split("/").pop()
+    const a = document.createElement("a")
+    a.href = url
+    a.download = <string>name
+
+    a.click()
+}

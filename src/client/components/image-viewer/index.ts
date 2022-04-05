@@ -1,5 +1,6 @@
 import {
     defineEl,
+    downloadImage,
     executeAfterTransition,
     TIMEOUT
 } from "../../utils"
@@ -57,12 +58,7 @@ export class ImageViewer extends HTMLElement {
     }
 
     private download() {
-        const name = this._src.split("/").pop()
-        const a = document.createElement("a")
-        a.href = this._src
-        a.download = <string>name
-
-        a.click()
+        downloadImage(this._src)
     }
 
     private next() {

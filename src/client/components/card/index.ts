@@ -1,4 +1,4 @@
-import {defineEl} from "../../utils"
+import {defineEl, downloadImage} from "../../utils"
 import template from "./index.html"
 
 export class Card extends HTMLElement {
@@ -31,7 +31,8 @@ export class Card extends HTMLElement {
 
     handleDownload = (evt: MouseEvent) => {
         evt.preventDefault()
-        console.log("download")
+        evt.stopPropagation()
+        downloadImage(this.highResolutionSrc)
     }
 
     set img(v: string) {
