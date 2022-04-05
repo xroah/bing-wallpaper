@@ -1,4 +1,8 @@
-import {defineEl, executeAfterTransition, TIMEOUT} from "../../utils"
+import {
+    defineEl,
+    executeAfterTransition,
+    TIMEOUT
+} from "../../utils"
 import {ImageItem} from "../image-item"
 import template from "./index.html"
 
@@ -151,10 +155,10 @@ export class ImageViewer extends HTMLElement {
         v.forEach(item => {
             const imageItem = new ImageItem()
             imageItem.src = item
-        
+
             frag.append(imageItem)
         })
-        
+
         _bodyEl.append(frag)
         this.update()
     }
@@ -184,7 +188,7 @@ export class ImageViewer extends HTMLElement {
 let viewer: ImageViewer | null = null
 
 function getScrollbarWidth() {
-    return window.innerWidth - document.documentElement.clientWidth    
+    return window.innerWidth - document.documentElement.clientWidth
 }
 
 export function viewImage(
@@ -209,6 +213,7 @@ export function viewImage(
         body.style.overflow = "hidden"
     }
 
+    body.classList.add("overflow-hidden")
     body.append(viewer)
     viewer.show()
     viewer.addEventListener(
@@ -227,10 +232,13 @@ export function removeViewer() {
     viewer.addEventListener(
         "hidden",
         () => {
+            const {body} = document
+
+            body.classList.remove("overflow-hidden")
             viewer?.remove()
 
-            document.body.style.overflow = ""
-            document.body.style.paddingRight = ""
+            body.style.overflow = ""
+            body.style.paddingRight = ""
             viewer = null
         },
         {once: true}

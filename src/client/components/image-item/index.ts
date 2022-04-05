@@ -20,20 +20,29 @@ export class ImageItem extends HTMLElement {
         this._src = v
     }
 
+    setLoadingVisible(v: boolean) {
+        this._loading.style.display = v ? "block" : "none"
+    }
+
     loadImg() {
         if (this._loaded) {
             return
         }
 
         this._img.src = this._src
-        this._loading.style.display = "flex"
 
         this._img.onload = () => {
-            this._loading.style.display = "none"
             this._loaded = true
             
             this._img.classList.remove("not-loaded")
+            this.setLoadingVisible(false)
         }
+        this._img.onerror = () => {
+            this.setLoadingVisible(false)
+            window.message.error("图片加载失败!")
+        }
+
+        this.setLoadingVisible(true)
     }
 }
 
