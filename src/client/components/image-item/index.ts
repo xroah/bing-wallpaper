@@ -4,6 +4,7 @@ import template from "./index.html"
 export class ImageItem extends HTMLElement {
     private _img: HTMLImageElement
     private _loading: HTMLElement
+    private _error: SVGElement
     private _loaded = false
     private _src = ""
 
@@ -14,6 +15,7 @@ export class ImageItem extends HTMLElement {
         shadow.innerHTML = template
         this._img = shadow.querySelector("img")!
         this._loading = shadow.querySelector("loading-comp")!
+        this._error = shadow.querySelector(".error")!
     }
 
     set src(v: string) {
@@ -25,6 +27,9 @@ export class ImageItem extends HTMLElement {
     }
 
     loadImg() {
+        this._error.style.display = "none"
+        this._img.style.display = ""
+
         if (this._loaded) {
             return
         }
@@ -38,6 +43,9 @@ export class ImageItem extends HTMLElement {
             this.setLoadingVisible(false)
         }
         this._img.onerror = () => {
+            this._img.style.display = "none"
+            this._error.style.display = "inline-block"
+
             this.setLoadingVisible(false)
             window.message.error("图片加载失败!")
         }
