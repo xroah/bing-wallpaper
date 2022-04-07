@@ -33,3 +33,14 @@ body {
 body.overflow-hidden {
     overflow: hidden;
 }
+
+.loading-wrapper {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    border-radius: .5rem;
+    background-color: rgba(0, 0, 0, .6);
+    padding: .5rem;
+    color: #fff;
+}

@@ -18,7 +18,10 @@ const loading = {
             return
         }
 
-        current = new Loading()
+        current = document.createElement("div")
+        
+        current.classList.add("loading-wrapper")
+        current.append(new Loading())
         document.body.append(current)
     },
     hide() {
