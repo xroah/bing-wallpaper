@@ -1,24 +1,25 @@
 import {defineEl, downloadImage} from "../../utils"
+import {ImageItem} from "../image-item"
 import template from "./index.html"
 
 export class Card extends HTMLElement {
-    private _img: HTMLImageElement
     private _headline: HTMLElement
     private _date: HTMLElement
     private _info: HTMLElement
     private _download: HTMLAnchorElement
     private _highResolutionSrc: string = ""
+    private _imgItem: ImageItem
 
     constructor() {
         super()
 
         const shadow = this.attachShadow({mode: "open"})
         shadow.innerHTML = template
-        this._img = shadow.querySelector("img")!
         this._headline = shadow.querySelector(".headline")!
         this._date = shadow.querySelector(".date")!
         this._info = shadow.querySelector(".info")!
         this._download = shadow.querySelector(".download-img")!
+        this._imgItem = shadow.querySelector("image-item")!
     }
 
     connectedCallback() {
@@ -36,7 +37,7 @@ export class Card extends HTMLElement {
     }
 
     set img(v: string) {
-        this._img.src = v
+        this._imgItem.src = v
     }
 
     set headline(v: string) {

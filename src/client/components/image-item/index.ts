@@ -22,6 +22,18 @@ export class ImageItem extends HTMLElement {
         this._src = v
     }
 
+    connectedCallback() {
+        const src = this.getAttribute("src")
+
+        if (src) {
+            this.src = src
+        }
+
+        if (this.hasAttribute("load")) {
+            this.loadImg()
+        }
+    }
+
     setLoadingVisible(v: boolean) {
         this._loading.style.display = v ? "block" : "none"
     }
