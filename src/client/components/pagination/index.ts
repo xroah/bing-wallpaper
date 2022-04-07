@@ -152,8 +152,6 @@ export class Pagination extends HTMLElement {
         } else if (cl.contains("next")) {
             this.goNext()
         }
-
-        this.emit()
     }
 
     emit() {
@@ -178,7 +176,13 @@ export class Pagination extends HTMLElement {
     }
 
     to(page: number) {
+        if (this.current === page) {
+            return
+        }
+
         this.current = page
+
+        this.emit()
     }
 
     get totalPages() {
