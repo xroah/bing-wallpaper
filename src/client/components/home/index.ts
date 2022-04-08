@@ -11,6 +11,7 @@ class Main extends HTMLElement {
     private _page = 1
     private _images: string[] = []
     private _first = true
+    private _cancel: (() => void) | null = null
 
     constructor() {
         super()
@@ -88,17 +89,34 @@ class Main extends HTMLElement {
             ) {
                 return
             }
-            
+
             this._page = page
 
             this.fetchImages()
         }
     }
 
-    fetchImages() {
-        window.loading.show()
+    cancel() {
+        if (this._cancel) {
+            this._cancel()
+        }
 
-        get(`/api/images?page=${this._page}`)
+        this._cancel = null
+    }
+
+    fetchImages() {
+        this.cancel()
+
+        const controller = new AbortController()
+        this._cancel = () => controller.abort()
+
+        window.loading.show()
+        get(
+            `/api/images?page=${this._page}`,
+            {
+                signal: controller.signal
+            }
+        )
             .then((data: any) => {
                 const {list, total} = data
                 const {_listEl, _pageEl} = this
@@ -128,7 +146,13 @@ class Main extends HTMLElement {
                     this._first = false
                 }
             })
-            .finally(window.loading.hide)
+            .finally(() => {
+                if (!controller.signal.aborted) {
+                    this._cancel = null
+                }
+
+                window.loading.hide()
+            })
     }
 }
 

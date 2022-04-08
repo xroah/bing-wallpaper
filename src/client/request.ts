@@ -26,8 +26,11 @@ export default function request(url: string, init: RequestInit = {}) {
                 showError(err.message || "数据解析失败")
             })
         }).catch(err => {
+            if (!init.signal || !init.signal.aborted) {
+                showError(err.message || "请求失败!")
+            }
+
             reject(err)
-            showError(err.message || "请求失败!")
         })
     })
 }
