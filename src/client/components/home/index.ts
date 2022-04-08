@@ -10,6 +10,7 @@ class Main extends HTMLElement {
     private _pageEl: Pagination
     private _page = 1
     private _images: string[] = []
+    private _first = true
 
     constructor() {
         super()
@@ -21,20 +22,13 @@ class Main extends HTMLElement {
     }
 
     connectedCallback() {
-        const {hash} = location
-        const [key, val] = hash.substring(1).split("=")
-
-        if (key === "page") {
-            this._page = Number.parseInt(val || "1") || 1
-            this._pageEl.current = this._page
-        }
-
-        this.fetchImages(this._page)
+        this.handleHashChange()
         this._pageEl.addEventListener(
             PAGE_CHANGE_EVENT,
             this.handlePageChange as any
         )
         this._listEl.addEventListener("click", this.handleClickCard)
+        window.addEventListener("hashchange", this.handleHashChange)
     }
 
     disconnectedCallback() {
@@ -42,11 +36,24 @@ class Main extends HTMLElement {
             PAGE_CHANGE_EVENT,
             this.handlePageChange as any
         )
+        window.removeEventListener("hashchange", this.handleHashChange)
+    }
+
+    parseHash() {
+        const {hash} = location
+        const [key, val] = hash.substring(1).split("=")
+        let page = -1
+
+        if (key === "page") {
+            page = Number.parseInt(val || "-1")
+        }
+
+        return page
     }
 
     handleClickCard = (evt: MouseEvent) => {
         const t = evt.target as Card
-        
+
         if (t.localName === "card-comp") {
             viewImage(
                 t.highResolutionSrc,
@@ -60,13 +67,35 @@ class Main extends HTMLElement {
     handlePageChange = (evt: CustomEvent) => {
         const {page} = evt.detail
 
+        if (this._page === page) {
+            return
+        }
+
         this._page = page
         location.hash = `page=${page}`
-
-        this.fetchImages()
     }
 
-    fetchImages(page?: number) {
+    handleHashChange = () => {
+        const page = this.parseHash()
+        const {totalPages, current} = this._pageEl
+
+        if (page > 0) {
+            // last page
+            if (
+                totalPages > 0 &&
+                totalPages === current &&
+                page > current
+            ) {
+                return
+            }
+            
+            this._page = page
+
+            this.fetchImages()
+        }
+    }
+
+    fetchImages() {
         window.loading.show()
 
         get(`/api/images?page=${this._page}`)
@@ -93,9 +122,10 @@ class Main extends HTMLElement {
 
                 _listEl.append(frag)
                 _pageEl.total = total
+                _pageEl.current = this._page
 
-                if (page) {
-                    _pageEl.current = page
+                if (this._first) {
+                    this._first = false
                 }
             })
             .finally(window.loading.hide)

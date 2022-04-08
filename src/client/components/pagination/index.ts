@@ -78,10 +78,12 @@ export class Pagination extends HTMLElement {
     }
 
     updateTotalPages() {
-        this._totalPages = Math.ceil(this.total / this._size)
+        this._totalPages = Math.ceil(this._total / this._size)
 
         if (this.current > this._totalPages) {
             this.current = this._totalPages
+
+            this.emit()
         }
 
         this.render()
@@ -189,10 +191,6 @@ export class Pagination extends HTMLElement {
         return this._totalPages
     }
 
-    get total() {
-        return this._total
-    }
-
     set total(v: number) {
         if (this._total !== v) {
             this._total = v
@@ -229,7 +227,9 @@ export class Pagination extends HTMLElement {
         if (this._size !== v) {
             this._size = v
 
-            this.updateTotalPages()
+            if (this._total > 0) {
+                this.updateTotalPages()
+            }
         }
     }
 
