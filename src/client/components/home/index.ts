@@ -10,7 +10,6 @@ class Main extends HTMLElement {
     private _pageEl: Pagination
     private _page = 1
     private _images: string[] = []
-    private _first = true
     private _cancel: (() => void) | null = null
 
     constructor() {
@@ -23,7 +22,10 @@ class Main extends HTMLElement {
     }
 
     connectedCallback() {
-        this.handleHashChange()
+        if (!this.handleHashChange()) {
+            this.fetchImages()
+        }
+
         this._pageEl.addEventListener(
             PAGE_CHANGE_EVENT,
             this.handlePageChange as any
@@ -87,13 +89,17 @@ class Main extends HTMLElement {
                 totalPages === current &&
                 page > current
             ) {
-                return
+                return false
             }
 
             this._page = page
 
             this.fetchImages()
+
+            return true
         }
+
+        return false
     }
 
     cancel() {
@@ -141,10 +147,6 @@ class Main extends HTMLElement {
                 _listEl.append(frag)
                 _pageEl.total = total
                 _pageEl.current = this._page
-
-                if (this._first) {
-                    this._first = false
-                }
             })
             .finally(() => {
                 if (!controller.signal.aborted) {
