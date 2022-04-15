@@ -1,4 +1,8 @@
-import {defineEl, executeAfterTransition, TIMEOUT} from "../../utils"
+import {
+    defineEl,
+    executeAfterTransition,
+    TIMEOUT
+} from "../../utils"
 import template from "./index.html"
 
 const PREFIX = "message"
@@ -152,7 +156,7 @@ export function closeAll() {
 }
 
 function factory(type: Type) {
-    return function(msg: string) {
+    return function (msg: string) {
         return showMessage(msg, type)
     }
 }

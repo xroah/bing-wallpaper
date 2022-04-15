@@ -12,8 +12,6 @@ export class Backdrop extends HTMLElement {
         this._el = this.shadowRoot!.querySelector(".backdrop")!
     }
 
-    connectedCallback() { }
-
     show() {
         const {_el: el} = this
 

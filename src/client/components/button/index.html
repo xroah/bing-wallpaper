@@ -1,4 +1,4 @@
-<button class="btn btn-primary">
+<button class="btn">
     <slot></slot>
 </button>
 <style>
@@ -43,20 +43,20 @@
         opacity: 0.65;
     }
 
-    .btn-primary {
+    .btn {
         color: #fff;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
     }
 
-    .btn-primary:active,
-    .btn-primary.active {
+    .btn:active,
+    .btn.active {
         background-color: var(--primary-focus-color);
         border-color: var(--primary-focus-color);
     }
 
-    .btn-primary:active:focus,
-    .btn-primary.active:focus {
+    .btn:active:focus,
+    .btn.active:focus {
         box-shadow: var(--focus-box-shadow);
     }
 </style>
