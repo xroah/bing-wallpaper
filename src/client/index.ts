@@ -10,4 +10,4 @@ import "./components/image-item"
 import "./components/image-viewer"
 import "./components/home"
 
-import "./index.css"
+import "./styles/index.css"
