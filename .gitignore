@@ -1,8 +1,6 @@
 .history
-/node_modules/
 .idea
 .vs
 Debug
-dist
 .DS_Store
 venv
