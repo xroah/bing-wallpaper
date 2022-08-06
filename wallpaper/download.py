@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import time
+from typing import Tuple
 
 import subprocess
 import requests
@@ -36,7 +37,7 @@ def get(url: str, i=0):
     return res
 
 
-def get_img_info() -> (str, str):
+def get_img_info() -> Tuple[str, str]:
     res = get(_host)
     img_url = ""
     title = ""
@@ -72,7 +73,9 @@ def download(img_url, title) -> None | str:
             return None
 
     home = os.path.expanduser("~")
-    img_dir = os.path.join(home, "Pictures")
+    year = time.strftime("%Y")
+    mon = time.strftime("%m")
+    img_dir = os.path.join(home, "Pictures", year, mon)
     name = "".join([time.strftime("%Y-%m-%d"), title])
     fullname = os.path.join(img_dir, name + ".jpg")
 
