@@ -1,12 +1,15 @@
+import json
 import sys
 import os
 import re
 import time
-from typing import Tuple
 
 import subprocess
+from typing import Tuple
+
 import requests
-from bs4 import BeautifulSoup
+
+from .DB import DB
 
 _max_retries = 10
 _host = "https://cn.bing.com"
@@ -37,55 +40,71 @@ def get(url: str, i=0):
     return res
 
 
-def get_img_info() -> Tuple[str, str]:
-    res = get(_host)
-    img_url = ""
-    title = ""
-
-    if res:
-        soup = BeautifulSoup(res.text, "html.parser")
-        preload = soup.select("#preloadBg")
-        title_el = soup.select(".musCardCont .title")
-
-        if len(preload):
-            img_url = preload[0]["href"]
-
-        if len(title_el):
-            title = title_el[0].string
-
-    return img_url, title
-
-
-def download(img_url, title) -> None | str:
-    if not img_url:
-        return None
-
-    uhd = re.sub(r"1920x1080", "UHD", img_url)
+def download_img(img_url: str, retry=True):
+    uhd = re.sub(r"\d+x\d+", "UHD", img_url)
     res = get(uhd)
 
     if not res:
         return None
 
     if res.status_code == 404:
-        res = requests.get(img_url)
+        if retry:
+            return download_img(img_url, False)
 
-        if not res:
-            return None
+        return None
 
+    return res
+
+
+def get_today_img() -> Tuple[str, str]:
     home = os.path.expanduser("~")
     year = time.strftime("%Y")
     mon = time.strftime("%m")
     img_dir = os.path.join(home, "Pictures", year, mon)
-    name = "".join([time.strftime("%Y-%m-%d"), title])
-    fullname = os.path.join(img_dir, name + ".jpg")
+    name = time.strftime("%Y%m%d")
+    img_path = os.path.join(img_dir, name + ".jpg")
+
+    return img_dir, img_path
+
+
+def download() -> None | str:
+    res = get(f"{_host}/hp/api/model")
+
+    if not res:
+        return None
+
+    ret = json.loads(res.text)
+    img_cnt = ret["MediaContents"][0]["ImageContent"]
+    img = img_cnt["Image"]
+    copy_right = img_cnt["Copyright"]
+    desc = img_cnt["Description"]
+    headline = img_cnt["Headline"]
+    title = img_cnt["Title"]
+    img_url = img["Url"]
+    res = download_img(img_url)
+
+    if not res:
+        return None
+
+    img_dir, img_path = get_today_img()
 
     if not os.path.exists(img_dir):
         os.makedirs(img_dir)
 
-    with open(fullname, "wb") as f:
+    with open(img_path, "wb") as f:
         f.write(res.content)
 
-    return fullname
+    with DB() as db:
+        db.insert(
+            title=title,
+            url=res.url,
+            headline=headline,
+            desc=desc,
+            copy_right=copy_right,
+            path=img_path
+        )
+
+    return img_path
 
 
 def set_wallpaper(img_path: str):
