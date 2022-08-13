@@ -1,5 +1,7 @@
-from wallpaper.download import download
-
+from wallpaper.App import App
+import wallpaper.icons
 
 if __name__ == "__main__":
-    download()
+    app = App()
+
+    app.exec()

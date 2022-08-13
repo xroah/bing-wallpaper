@@ -35,7 +35,9 @@ class DB:
                 headline VARCHAR(100),
                 copyright VARCHAR(100),
                 url VARCHAR(200),
-                path VARCHAR(500)
+                path VARCHAR(500),
+                date DATE,
+                thumbnail VARCHAR(500)
             );
         """)
 
@@ -49,12 +51,11 @@ class DB:
             url: str,
             path: str
     ):
-
         self._cursor.execute(f"""
-            INSERT INTO images(title, desc, headline, copyright,
-            url, path, create_time) VALUES('{title}', '{desc}',
+            INSERT INTO images(title, desc, headline, copyright,url, 
+            path, date, create_time) VALUES('{title}', '{desc}',
             '{headline}', '{copy_right}', '{url}', '{path}', 
-            datetime('now', 'localtime'));
+            date('now', 'localtime'), datetime('now', 'localtime'));
         """)
 
     def query(self):
