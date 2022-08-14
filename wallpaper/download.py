@@ -20,7 +20,7 @@ def get(url: str, i=0):
         return requests.get(
             url,
             headers={
-                "referer": f"{_host}",
+                "referer": f"{_host}/?FORM=BEHPTB",
                 "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77"
             }
         )
@@ -68,7 +68,12 @@ def get_today_img() -> Tuple[str, str]:
 
 
 def download() -> None | str:
-    res = get(f"{_host}/hp/api/model")
+    img_dir, img_path = get_today_img()
+
+    if os.path.exists(img_path):
+        return img_path
+
+    res = get(f"{_host}/hp/api/model?FORM=BEHPTB")
 
     if not res:
         return None
@@ -85,8 +90,6 @@ def download() -> None | str:
 
     if not res:
         return None
-
-    img_dir, img_path = get_today_img()
 
     if not os.path.exists(img_dir):
         os.makedirs(img_dir)
