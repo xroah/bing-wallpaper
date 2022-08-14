@@ -1,5 +1,9 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>./logo.png</file>
+    <file>./chevron-left.png</file>
+    <file>./chevron-right.png</file>
+    <file>./minus.png</file>
+    <file>./settings.png</file>
 </qresource>
 </RCC>

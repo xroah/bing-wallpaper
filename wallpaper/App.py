@@ -28,6 +28,8 @@ class App(QApplication):
         if size.height() + y >= screen_size.height():
             y -= size.height()
 
+        self.win.showNormal()
         self.win.move(x, y)
-        self.win.show()
+        self.activeWindow()
+        self.win.raise_()
 
