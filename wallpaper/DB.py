@@ -12,6 +12,7 @@ class DB:
 
         self._conn = sqlite3.connect(f"{data_dir}/data.db")
         self._cursor = self._conn.cursor()
+        self._cursor.row_factory = sqlite3.Row
 
         self.create_table()
 

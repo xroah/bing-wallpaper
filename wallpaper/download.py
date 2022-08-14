@@ -42,7 +42,7 @@ def get(url: str, i=0):
 
 def download_img(img_url: str, retry=True):
     uhd = re.sub(r"\d+x\d+", "UHD", img_url)
-    res = get(uhd)
+    res = get(uhd + "&w=3840&h=2160")
 
     if not res:
         return None

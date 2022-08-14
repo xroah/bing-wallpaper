@@ -8,10 +8,12 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QLabel,
     QPushButton,
-    QToolButton
+    QToolButton,
+    QWidget
 )
 from PySide6.QtUiTools import QUiLoader
 
+from .DB import DB
 from .Menu import Menu
 
 
@@ -24,9 +26,17 @@ class Window(QMainWindow):
         ui_file = os.path.join(cwd, "assets/window.ui")
         style = os.path.join(cwd, "assets/window.css")
         widget = loader.load(ui_file)
+        summary = cast(
+            QWidget,
+            widget.findChild(QWidget, "summary")
+        )
         self.prev_btn = cast(
             QPushButton,
             widget.findChild(QPushButton, "prev")
+        )
+        self.next_btn = cast(
+            QPushButton,
+            widget.findChild(QPushButton, "next")
         )
         self.thumbnail_label = cast(
             QLabel,
@@ -35,6 +45,14 @@ class Window(QMainWindow):
         self.logo_label = cast(
             QLabel,
             widget.findChild(QLabel, "logo")
+        )
+        self.title_label = cast(
+            QLabel,
+            widget.findChild(QLabel, "title")
+        )
+        self.copyright_label = cast(
+            QLabel,
+            widget.findChild(QLabel, "copyright")
         )
         self.settings_btn = cast(
             QToolButton,
@@ -45,6 +63,7 @@ class Window(QMainWindow):
             widget.findChild(QToolButton, "minimize")
         )
 
+        summary.layout().setAlignment(Qt.AlignTop)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setCentralWidget(widget)
         self.setFixedSize(360, 200)
@@ -54,16 +73,35 @@ class Window(QMainWindow):
         with open(style, "r") as f:
             self.setStyleSheet(f.read())
 
+    @staticmethod
+    def get_icon(name: str):
+        return QIcon(f":/{name}.png")
+
     def init(self):
         self.thumbnail_label.setFixedSize(96, 54)
+        self.thumbnail_label.setScaledContents(True)
         self.logo_label.setPixmap(QPixmap(":/logo.png"))
         self.logo_label.setFixedSize(30, 30)
         self.logo_label.setScaledContents(True)
-        self.min_btn.setIcon(QIcon(":/minus.png"))
-        self.settings_btn.setIcon(QIcon(":/settings.png"))
+        self.min_btn.setIcon(self.get_icon("minus"))
+        self.settings_btn.setIcon(self.get_icon("settings"))
         self.settings_btn.setPopupMode(QToolButton.InstantPopup)
         self.settings_btn.setMenu(self.get_menu())
+        self.prev_btn.setIcon(self.get_icon("chevron-left"))
+        self.next_btn.setIcon(self.get_icon("chevron-right"))
+        self.next_btn.setLayoutDirection(Qt.RightToLeft)
+        self.title_label.setWordWrap(True)
+
         self.min_btn.clicked.connect(self.hide)
+
+        with DB() as db:
+            ret = db.query()
+
+        if len(ret):
+            row = ret[0]
+            self.title_label.setText(row["title"])
+            self.copyright_label.setText(row["copyright"])
+            self.thumbnail_label.setPixmap(QPixmap(row["path"]))
 
     def get_menu(self):
         menu = Menu(self, self.settings_btn)

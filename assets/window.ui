@@ -141,6 +141,12 @@
           <property name="spacing">
            <number>10</number>
           </property>
+          <property name="leftMargin">
+           <number>8</number>
+          </property>
+          <property name="rightMargin">
+           <number>8</number>
+          </property>
           <item>
            <widget class="QLabel" name="thumbnail">
             <property name="sizePolicy">
@@ -164,28 +170,40 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QLabel" name="title">
-              <property name="text">
-               <string>title</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>text</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="copyright">
-              <property name="text">
-               <string>copyright</string>
-              </property>
-              <property name="class" stdset="0">
-               <string>text</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QWidget" name="summary" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <layout class="QVBoxLayout" name="summaryLayout">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="title">
+                 <property name="text">
+                  <string>title</string>
+                 </property>
+                 <property name="class" stdset="0">
+                  <string>text</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="copyright">
+                 <property name="styleSheet">
+                  <string notr="true">font-size: 12px;</string>
+                 </property>
+                 <property name="text">
+                  <string>copyright</string>
+                 </property>
+                 <property name="class" stdset="0">
+                  <string>text</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </item>
@@ -218,7 +236,13 @@
           <item>
            <widget class="QPushButton" name="prev">
             <property name="text">
-             <string>PushButton</string>
+             <string>上一张</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
             </property>
             <property name="class" stdset="0">
              <string>nav-btn</string>
@@ -241,7 +265,13 @@
           <item>
            <widget class="QPushButton" name="next">
             <property name="text">
-             <string>PushButton</string>
+             <string>下一张</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
             </property>
             <property name="class" stdset="0">
              <string>nav-btn</string>

@@ -23,12 +23,14 @@ QMenu::item {
     padding: 5px;
 }
 
-QToolButton:hover {
-    background-color: rgba(255, 255, 255, .2);
+QToolButton:hover, .nav-btn:hover {
+    background-color: rgba(255, 255, 255, .1);
 }
 
-QToolButton:pressed, QMenu::item:selected {
-    background-color: rgba(255, 255, 255, .5);
+QToolButton:pressed,
+QMenu::item:selected,
+.nav-btn:pressed {
+    background-color: rgba(255, 255, 255, .3);
 }
 
 .nav {
@@ -36,5 +38,13 @@ QToolButton:pressed, QMenu::item:selected {
 }
 
 .text, QMenu::item {
+    color: #fff;
+}
+
+.nav-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
     color: #fff;
 }
