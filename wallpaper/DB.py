@@ -1,15 +1,12 @@
 import sqlite3
 import os
 
+from .Settings import Settings
+
 
 class DB:
     def __init__(self):
-        home = os.path.expanduser("~")
-        data_dir = os.path.join(home, ".bing")
-
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-
+        data_dir = Settings.get_data_dir()
         self._conn = sqlite3.connect(f"{data_dir}/data.db")
         self._cursor = self._conn.cursor()
         self._cursor.row_factory = sqlite3.Row

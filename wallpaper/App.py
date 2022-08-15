@@ -3,7 +3,7 @@ import sys
 import time
 from threading import Thread
 
-from PySide6.QtGui import QIcon, QCursor
+from PySide6.QtGui import QIcon, QCursor, QAction
 from PySide6.QtWidgets import (
     QApplication,
     QSystemTrayIcon,
@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from .DB import DB
 from .Window import Window
+from .actions import get_quit_action, get_refresh_action
 from .download import download, set_wallpaper
 
 
@@ -19,6 +20,9 @@ class App(QApplication):
     def __init__(self):
         super().__init__()
 
+        self.refresh_action: QAction | None = None
+        self.prev_action: QAction | None = None
+        self.next_action: QAction | None = None
         self.tray = QSystemTrayIcon(QIcon(":/logo.png"), self)
         today = time.strftime("%Y-%m-%d")
 
@@ -40,6 +44,7 @@ class App(QApplication):
             else:
                 set_wallpaper(wps[0]["path"])
 
+        self.tray.setToolTip("必应壁纸")
         self.tray.show()
 
     def tray_activated(self, reason):
@@ -71,11 +76,13 @@ class App(QApplication):
         if img is not None:
             set_wallpaper(img["path"])
 
-    @staticmethod
-    def get_ctx_menu():
+    def get_ctx_menu(self):
         menu = QMenu()
-        quit_action = menu.addAction("退出")
+        self.refresh_action = get_refresh_action(menu)
+        self.prev_action = menu.addAction("上一个")
+        self.next_action = menu.addAction("下一个")
+        get_quit_action(menu)
 
-        quit_action.triggered.connect(lambda: sys.exit(0))
+        self.refresh_action.setCheckable(True)
 
         return menu

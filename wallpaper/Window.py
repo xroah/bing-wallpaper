@@ -15,6 +15,7 @@ from PySide6.QtUiTools import QUiLoader
 
 from .DB import DB
 from .Menu import Menu
+from .actions import get_quit_action, get_refresh_action
 
 
 class Window(QMainWindow):
@@ -105,12 +106,9 @@ class Window(QMainWindow):
 
     def get_menu(self):
         menu = Menu(self, self.settings_btn)
-        refresh_action = menu.addAction("每日壁纸刷新")
-        quit_action = menu.addAction("退出")
+        refresh_action = get_refresh_action(menu)
+        get_quit_action(menu)
         refresh_action.setCheckable(True)
-        quit_action.triggered.connect(
-            lambda: sys.exit(0)
-        )
         menu.setAttribute(Qt.WA_TranslucentBackground)
         menu.setWindowFlag(Qt.FramelessWindowHint)
 
