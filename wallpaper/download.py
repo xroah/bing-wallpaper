@@ -5,7 +5,7 @@ import re
 import time
 
 import subprocess
-from typing import Tuple
+from typing import Tuple, Dict
 
 import requests
 
@@ -67,11 +67,8 @@ def get_today_img() -> Tuple[str, str]:
     return img_dir, img_path
 
 
-def download() -> None | str:
+def download() -> None | Dict[str, str]:
     img_dir, img_path = get_today_img()
-
-    if os.path.exists(img_path):
-        return img_path
 
     res = get(f"{_host}/hp/api/model?FORM=BEHPTB")
 
@@ -107,7 +104,14 @@ def download() -> None | str:
             path=img_path
         )
 
-    return img_path
+    return {
+        "title": title,
+        "url": res.url,
+        "headline": headline,
+        "desc": desc,
+        "copy_right": copy_right,
+        "path": img_path
+    }
 
 
 def set_wallpaper(img_path: str):

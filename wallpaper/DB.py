@@ -60,4 +60,6 @@ class DB:
         """)
 
     def query(self):
-        return self._cursor.execute("SELECT * FROM images").fetchall()
+        return self._cursor.execute(
+            "SELECT * FROM images ORDER BY date DESC limit 10;"
+        ).fetchall()
