@@ -92,6 +92,7 @@ class Window(QMainWindow):
         self.next_btn.setIcon(self.get_icon("chevron-right"))
         self.next_btn.setLayoutDirection(Qt.RightToLeft)
         self.title_label.setWordWrap(True)
+        self.copyright_label.setWindowFlag(True)
 
         self.min_btn.clicked.connect(self.hide)
 

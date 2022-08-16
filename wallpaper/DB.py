@@ -58,5 +58,5 @@ class DB:
 
     def query(self):
         return self._cursor.execute(
-            "SELECT * FROM images ORDER BY date DESC limit 10;"
+            "SELECT * FROM images ORDER BY date DESC limit 7;"
         ).fetchall()
