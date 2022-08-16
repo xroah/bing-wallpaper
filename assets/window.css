@@ -48,3 +48,7 @@ QMenu::item:selected,
     background-color: transparent;
     color: #fff;
 }
+
+.copyright {
+    color: #999;
+}

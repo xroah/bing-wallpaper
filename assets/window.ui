@@ -139,7 +139,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
-           <number>10</number>
+           <number>5</number>
           </property>
           <property name="leftMargin">
            <number>8</number>
@@ -196,7 +196,7 @@
                   <string>copyright</string>
                  </property>
                  <property name="class" stdset="0">
-                  <string>text</string>
+                  <string>text copyright</string>
                  </property>
                 </widget>
                </item>
