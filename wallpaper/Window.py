@@ -67,7 +67,7 @@ class Window(QMainWindow):
         summary.layout().setAlignment(Qt.AlignTop)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setCentralWidget(widget)
-        self.setFixedSize(360, 200)
+        self.setFixedSize(360, 180)
         self.setFocusPolicy(Qt.StrongFocus)
         self.init()
 
@@ -92,7 +92,7 @@ class Window(QMainWindow):
         self.next_btn.setIcon(self.get_icon("chevron-right"))
         self.next_btn.setLayoutDirection(Qt.RightToLeft)
         self.title_label.setWordWrap(True)
-        self.copyright_label.setWindowFlag(True)
+        self.copyright_label.setWordWrap(True)
 
         self.min_btn.clicked.connect(self.hide)
 

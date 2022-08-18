@@ -50,19 +50,15 @@ class App(QApplication):
     def tray_activated(self, reason):
         if not self.win:
             return
-
         size = self.win.size()
+        tray_geo = self.tray.geometry()
         screen = QApplication.primaryScreen()
         screen_size = screen.size()
-        pos = QCursor.pos()
-        x = pos.x()
-        y = pos.y()
+        x = tray_geo.x() + tray_geo.width() / 2
+        y = tray_geo.height() + 2
 
         if size.width() + x >= screen_size.width():
             x -= size.width()
-
-        if size.height() + y >= screen_size.height():
-            y -= size.height()
 
         self.win.showNormal()
         self.win.move(x, y)
