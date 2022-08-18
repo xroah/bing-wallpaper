@@ -34,8 +34,7 @@ class DB:
                 copyright VARCHAR(100),
                 url VARCHAR(200),
                 path VARCHAR(500),
-                date DATE,
-                thumbnail VARCHAR(500)
+                date DATE
             );
         """)
 

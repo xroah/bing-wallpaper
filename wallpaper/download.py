@@ -109,7 +109,7 @@ def download() -> None | Dict[str, str]:
         "url": res.url,
         "headline": headline,
         "desc": desc,
-        "copy_right": copy_right,
+        "copyright": copy_right,
         "path": img_path
     }
 

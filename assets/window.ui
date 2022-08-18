@@ -59,19 +59,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="windowTitle">
-         <property name="styleSheet">
-          <string notr="true">c</string>
-         </property>
-         <property name="text">
-          <string>壁纸</string>
-         </property>
-         <property name="class" stdset="0">
-          <string>window-title text</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -180,7 +167,7 @@
                <item>
                 <widget class="QLabel" name="title">
                  <property name="text">
-                  <string>title</string>
+                  <string>--</string>
                  </property>
                  <property name="class" stdset="0">
                   <string>text</string>
@@ -193,7 +180,7 @@
                   <string notr="true">font-size: 12px;</string>
                  </property>
                  <property name="text">
-                  <string>copyright</string>
+                  <string>--</string>
                  </property>
                  <property name="class" stdset="0">
                   <string>text copyright</string>

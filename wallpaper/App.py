@@ -1,7 +1,4 @@
-import os.path
 import sys
-import time
-from threading import Thread
 
 from PySide6.QtGui import QIcon, QCursor, QAction
 from PySide6.QtWidgets import (
@@ -10,10 +7,9 @@ from PySide6.QtWidgets import (
     QMenu
 )
 
-from .DB import DB
 from .Window import Window
 from .actions import get_quit_action, get_refresh_action
-from .download import download, set_wallpaper
+from .download import set_wallpaper
 
 
 class App(QApplication):
@@ -24,25 +20,12 @@ class App(QApplication):
         self.prev_action: QAction | None = None
         self.next_action: QAction | None = None
         self.tray = QSystemTrayIcon(QIcon(":/logo.png"), self)
-        today = time.strftime("%Y-%m-%d")
 
         if sys.platform == "darwin":
             self.win = Window()
             self.tray.activated.connect(self.tray_activated)
         elif sys.platform == "linux":
             self.tray.setContextMenu(self.get_ctx_menu())
-
-        with DB() as db:
-            wps = db.query()
-            if (
-                    not len(wps) or
-                    wps[0]["date"] != today
-            ):
-                t = Thread(target=self.download_img)
-                t.daemon = True
-                t.start()
-            else:
-                set_wallpaper(wps[0]["path"])
 
         self.tray.setToolTip("必应壁纸")
         self.tray.show()
@@ -64,13 +47,6 @@ class App(QApplication):
         self.win.move(x, y)
         self.activeWindow()
         self.win.raise_()
-
-    @staticmethod
-    def download_img():
-        img = download()
-
-        if img is not None:
-            set_wallpaper(img["path"])
 
     def get_ctx_menu(self):
         menu = QMenu()

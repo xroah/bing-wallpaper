@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import cast
 
 from PySide6.QtCore import Qt
@@ -13,9 +12,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 
-from .DB import DB
 from .Menu import Menu
 from .actions import get_quit_action, get_refresh_action
+from .Manager import Manager
 
 
 class Window(QMainWindow):
@@ -63,6 +62,7 @@ class Window(QMainWindow):
             QToolButton,
             widget.findChild(QToolButton, "minimize")
         )
+        self.m = Manager()
 
         summary.layout().setAlignment(Qt.AlignTop)
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -95,15 +95,6 @@ class Window(QMainWindow):
         self.copyright_label.setWordWrap(True)
 
         self.min_btn.clicked.connect(self.hide)
-
-        with DB() as db:
-            ret = db.query()
-
-        if len(ret):
-            row = ret[0]
-            self.title_label.setText(row["title"])
-            self.copyright_label.setText(row["copyright"])
-            self.thumbnail_label.setPixmap(QPixmap(row["path"]))
 
     def get_menu(self):
         menu = Menu(self, self.settings_btn)
