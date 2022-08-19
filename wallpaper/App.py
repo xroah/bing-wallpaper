@@ -9,7 +9,6 @@ from PySide6.QtWidgets import (
 
 from .Window import Window
 from .actions import get_quit_action, get_refresh_action
-from .download import set_wallpaper
 
 
 class App(QApplication):

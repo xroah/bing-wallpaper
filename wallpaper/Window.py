@@ -70,9 +70,32 @@ class Window(QMainWindow):
         self.setFixedSize(360, 180)
         self.setFocusPolicy(Qt.StrongFocus)
         self.init()
+        self.set_status()
+
+        self.next_btn.clicked.connect(self.next)
+        self.prev_btn.clicked.connect(self.prev)
 
         with open(style, "r") as f:
             self.setStyleSheet(f.read())
+
+    def set_status(self):
+        info = self.m.get_current_info()
+
+        if info:
+            self.title_label.setText(info["title"])
+            self.copyright_label.setText(info["copyright"])
+
+        self.next_btn.setEnabled(self.m.index != 6)
+        self.prev_btn.setEnabled(self.m.index != 0)
+        self.thumbnail_label.setPixmap(QPixmap(info["path"]))
+
+    def prev(self):
+        self.m.prev()
+        self.set_status()
+
+    def next(self):
+        self.m.next()
+        self.set_status()
 
     @staticmethod
     def get_icon(name: str):

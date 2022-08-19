@@ -46,13 +46,14 @@ class DB:
             headline: str,
             copy_right: str,
             url: str,
-            path: str
+            path: str,
+            date: str
     ):
         self._cursor.execute(f"""
-            INSERT INTO images(title, desc, headline, copyright,url, 
+            INSERT INTO images(title, desc, headline, copyright, url, 
             path, date, create_time) VALUES('{title}', '{desc}',
             '{headline}', '{copy_right}', '{url}', '{path}', 
-            date('now', 'localtime'), datetime('now', 'localtime'));
+            '{date}', datetime('now', 'localtime'));
         """)
 
     def query(self):
