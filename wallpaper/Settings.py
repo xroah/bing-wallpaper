@@ -1,9 +1,15 @@
 import json
 import os
 
+from PySide6.QtCore import QObject, Signal
 
-class Settings:
+
+class Settings(QObject):
+    change_sig = Signal()
+
     def __init__(self):
+        super().__init__()
+
         self.refresh = self.get()
 
     @staticmethod
@@ -32,9 +38,14 @@ class Settings:
             return True
 
     def set(self, refresh: bool):
+        if self.refresh == refresh:
+            return
+
         self.refresh = refresh
         data_dir = self.get_data_dir()
         file = os.path.join(data_dir, "settings.json")
+
+        self.change_sig.emit()
 
         with open(file, "w") as f:
             json.dump({"refresh": refresh}, f)

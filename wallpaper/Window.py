@@ -74,6 +74,7 @@ class Window(QMainWindow):
 
         self.next_btn.clicked.connect(self.next)
         self.prev_btn.clicked.connect(self.prev)
+        self.m.change_sig.connect(self.set_status)
 
         with open(style, "r") as f:
             self.setStyleSheet(f.read())

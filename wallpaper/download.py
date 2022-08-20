@@ -21,7 +21,8 @@ def get(url: str, i=0):
             headers={
                 "referer": host,
                 "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77"
-            }
+            },
+            timeout=60
         )
 
     try:

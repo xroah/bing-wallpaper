@@ -1,6 +1,10 @@
 import datetime
 import os.path
+import sched
+import time
+from threading import Thread
 
+from PySide6.QtCore import Signal, QObject
 from .DB import DB
 from .download import (
     download_img,
@@ -8,16 +12,24 @@ from .download import (
     host
 )
 from .utils import set_wallpaper
+from .Settings import settings
 
 
-class Manager:
+class Manager(QObject):
+    change_sig = Signal()
+
     def __init__(self):
+        super().__init__()
+
         days = []
         today = datetime.date.today()
+        self.sched = sched.scheduler(time.time, time.sleep)
+        self.event = None
         self.days = days
         self.index = 6
         self.wallpapers = {}
-        self.model = []
+        self.model = {}
+        self.check_t: Thread | None = None
 
         for i in range(6, -1, -1):
             day = today + datetime.timedelta(days=-i)
@@ -25,6 +37,54 @@ class Manager:
 
         self.init_data()
         self.set_wallpaper()
+        self.start_check()
+
+        settings.change_sig.connect(self.settings_change)
+
+    def settings_change(self):
+        if not settings.refresh:
+            if self.event:
+                self.sched.cancel(self.event)
+                self.check_t = None
+                self.event = None
+        else:
+            if not self.check_t:
+                self.start_check()
+
+    def start_check(self):
+        if not settings.refresh:
+            return
+
+        t = Thread(target=self.sched.run)
+        t.daemon = True
+        self.check_t = t
+
+        self.check()
+        t.start()
+
+    def update(self):
+        today = str(datetime.date.today())
+
+        print("check result", today in self.days)
+
+        if today not in self.days:
+            first = self.days[0]
+            self.days = self.days[1:]
+            self.days.append(today)
+            self.index = 6
+
+            if first in self.wallpapers:
+                del self.wallpapers[first]
+
+            self.get_model()
+            self.set_wallpaper()
+            self.change_sig.emit()
+
+        self.check()
+
+    def check(self):
+        # check every 10 minutes
+        self.event = self.sched.enter(10, 1, self.update)
 
     def init_data(self):
         with DB() as db:
@@ -41,22 +101,20 @@ class Manager:
         res = get(f"{host}/hp/api/model?FORM=BEHPTB")
 
         if res is not None:
-            self.model = []
+            self.model.clear()
             data = res.json()
             contents = data["MediaContents"]
+            days = list(reversed(self.days))
 
-            for c in contents:
+            for i, c in enumerate(contents):
                 img_cnt = c["ImageContent"]
-                self.model.insert(
-                    0,
-                    {
+                self.model[days[i]] = {
                         "copyright": img_cnt["Copyright"],
                         "title": img_cnt["Title"],
                         "headline": img_cnt["Headline"],
                         "url": img_cnt["Image"]["Url"],
                         "desc": img_cnt["Description"]
                     }
-                )
 
     def get_current_info(self):
         date = self.days[self.index]
@@ -88,13 +146,14 @@ class Manager:
             set_wallpaper(img_path)
 
     def download(self, date):
-        if not len(self.model):
+        if date not in self.model:
+            self.model.clear()
             self.get_model()
 
-        if not len(self.model):
+        if not len(self.model.keys()):
             return
 
-        d = self.model[self.index]
+        d = self.model[date]
         img_path = download_img(d["url"], date)
 
         if not img_path:
@@ -112,7 +171,7 @@ class Manager:
         if not img_path:
             return None
 
-        d = self.model[self.index]
+        d = self.model[date]
 
         with DB() as db:
             db.insert(
@@ -132,4 +191,3 @@ class Manager:
         }
 
         return img_path
-
