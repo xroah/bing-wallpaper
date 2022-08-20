@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>168</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -164,6 +164,16 @@
                <property name="spacing">
                 <number>5</number>
                </property>
+               <item>
+                <widget class="QLabel" name="date">
+                 <property name="text">
+                  <string>--</string>
+                 </property>
+                 <property name="class" stdset="0">
+                  <string>text</string>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <widget class="QLabel" name="title">
                  <property name="text">

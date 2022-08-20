@@ -94,7 +94,8 @@ class Manager(QObject):
                 self.wallpapers[w["date"]] = {
                     "copyright": w["copyright"],
                     "path": w["path"],
-                    "title": w["title"]
+                    "title": w["title"],
+                    "date": w["date"]
                 }
 
     def get_model(self):
@@ -187,7 +188,8 @@ class Manager(QObject):
         self.wallpapers[date] = {
             "title": d["title"],
             "path": img_path,
-            "copyright": d["copyright"]
+            "copyright": d["copyright"],
+            "date": date
         }
 
         return img_path

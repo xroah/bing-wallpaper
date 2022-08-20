@@ -46,6 +46,10 @@ class Window(QMainWindow):
             QLabel,
             widget.findChild(QLabel, "logo")
         )
+        self.date_label = cast(
+            QLabel,
+            widget.findChild(QLabel, "date")
+        )
         self.title_label = cast(
             QLabel,
             widget.findChild(QLabel, "title")
@@ -67,7 +71,7 @@ class Window(QMainWindow):
         summary.layout().setAlignment(Qt.AlignTop)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setCentralWidget(widget)
-        self.setFixedSize(360, 180)
+        self.setFixedSize(360, 200)
         self.setFocusPolicy(Qt.StrongFocus)
         self.init()
         self.set_status()
@@ -83,12 +87,13 @@ class Window(QMainWindow):
         info = self.m.get_current_info()
 
         if info:
+            self.date_label.setText(info["date"])
             self.title_label.setText(info["title"])
             self.copyright_label.setText(info["copyright"])
+            self.thumbnail_label.setPixmap(QPixmap(info["path"]))
 
         self.next_btn.setEnabled(self.m.index != 6)
         self.prev_btn.setEnabled(self.m.index != 0)
-        self.thumbnail_label.setPixmap(QPixmap(info["path"]))
 
     def prev(self):
         self.m.prev()
