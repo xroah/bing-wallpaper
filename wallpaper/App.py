@@ -1,30 +1,23 @@
 import sys
 
-from PySide6.QtGui import QIcon, QCursor, QAction
-from PySide6.QtWidgets import (
-    QApplication,
-    QSystemTrayIcon,
-    QMenu
-)
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 
 from .Window import Window
-from .actions import get_quit_action, get_refresh_action
+from .ContextMenu import ContextMenu
 
 
 class App(QApplication):
     def __init__(self):
         super().__init__()
 
-        self.refresh_action: QAction | None = None
-        self.prev_action: QAction | None = None
-        self.next_action: QAction | None = None
         self.tray = QSystemTrayIcon(QIcon(":/logo.png"), self)
 
         if sys.platform == "darwin":
             self.win = Window()
             self.tray.activated.connect(self.tray_activated)
         elif sys.platform == "linux":
-            self.tray.setContextMenu(self.get_ctx_menu())
+            self.tray.setContextMenu(ContextMenu())
 
         self.tray.setToolTip("必应壁纸")
         self.tray.show()
@@ -46,14 +39,3 @@ class App(QApplication):
         self.win.move(x, y)
         self.activeWindow()
         self.win.raise_()
-
-    def get_ctx_menu(self):
-        menu = QMenu()
-        self.refresh_action = get_refresh_action(menu)
-        self.prev_action = menu.addAction("上一个")
-        self.next_action = menu.addAction("下一个")
-        get_quit_action(menu)
-
-        self.refresh_action.setCheckable(True)
-
-        return menu
