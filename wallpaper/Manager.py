@@ -21,25 +21,30 @@ class Manager(QObject):
     def __init__(self):
         super().__init__()
 
-        days = []
-        today = datetime.date.today()
         self.sched = sched.scheduler(time.time, time.sleep)
         self.event = None
-        self.days = days
+        self.days = []
         self.index = 6
         self.wallpapers = {}
         self.model = {}
         self.check_t: Thread | None = None
 
-        for i in range(6, -1, -1):
-            day = today + datetime.timedelta(days=-i)
-            days.append(str(day))
-
+        self.init_days()
         self.init_data()
         self.set_wallpaper()
         self.start_check()
 
         settings.change_sig.connect(self.settings_change)
+
+    def init_days(self):
+        today = datetime.date.today()
+        days = []
+
+        for i in range(6, -1, -1):
+            day = today + datetime.timedelta(days=-i)
+            days.append(str(day))
+
+        self.days = days
 
     def settings_change(self):
         if not settings.refresh:
@@ -64,27 +69,30 @@ class Manager(QObject):
 
     def update(self):
         today = str(datetime.date.today())
+        need_update = today not in self.wallpapers
+        self.init_days()
 
-        print("check result", today in self.days)
+        print("check result:", need_update)
 
-        if today not in self.days:
-            first = self.days[0]
-            self.days = self.days[1:]
-            self.days.append(today)
+        if need_update:
             self.index = 6
+            not_existing_keys = []
 
-            if first in self.wallpapers:
-                del self.wallpapers[first]
-
-            self.get_model()
-            self.set_wallpaper()
             self.change_sig.emit()
+            self.set_wallpaper()
+
+            for k in self.wallpapers:
+                if k not in self.days:
+                    not_existing_keys.append(k)
+
+            for k in not_existing_keys:
+                del self.wallpapers[k]
 
         self.check()
 
     def check(self):
         # check every 10 minutes
-        self.event = self.sched.enter(10, 1, self.update)
+        self.event = self.sched.enter(600, 1, self.update)
 
     def init_data(self):
         with DB() as db:
