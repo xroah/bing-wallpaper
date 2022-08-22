@@ -48,8 +48,9 @@ def download_img(
     if not img_url.startswith("https://"):
         img_url = host + img_url
 
-    uhd = re.sub(r"\d+x\d+", "UHD", img_url)
-    res = get(uhd + "&w=3840&h=2160")
+    # uhd = re.sub(r"\d+x\d+", "UHD", img_url)
+    # res = get(uhd + "&w=3840&h=2160")
+    res = get(img_url)
     img_dir, img_path = get_today_img()
 
     if date:
@@ -58,11 +59,11 @@ def download_img(
     if not res:
         return None
 
-    if res.status_code == 404:
-        if retry:
-            return download_img(img_url, date, False)
-
-        return None
+    # if res.status_code == 404:
+    #     if retry:
+    #         return download_img(img_url, date, False)
+    #
+    #     return None
 
     if not os.path.exists(img_dir):
         os.makedirs(img_dir)
