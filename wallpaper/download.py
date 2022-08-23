@@ -1,13 +1,7 @@
-import json
-import sys
 import os
-import re
-
-from typing import Dict
 
 import requests
 
-from .DB import DB
 from .utils import get_today_img
 
 _max_retries = 10
