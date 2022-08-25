@@ -75,10 +75,8 @@ class Manager(QObject):
         print("check result:", need_update)
 
         if need_update:
-            self.index = 6
             not_existing_keys = []
 
-            self.change_sig.emit()
             self.set_wallpaper()
 
             for k in self.wallpapers:
@@ -87,6 +85,9 @@ class Manager(QObject):
 
             for k in not_existing_keys:
                 del self.wallpapers[k]
+
+            self.index = 6
+            self.change_sig.emit()
 
         self.check()
 
