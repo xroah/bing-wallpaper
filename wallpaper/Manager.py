@@ -134,15 +134,17 @@ class Manager(QObject):
 
         return None
 
+    def to(self, index: int):
+        self.index = index
+        self.set_wallpaper()
+
     def prev(self):
         if self.index > 0:
-            self.index -= 1
-            self.set_wallpaper()
+            self.to(self.index - 1)
 
     def next(self):
         if self.index < 6:
-            self.index += 1
-            self.set_wallpaper()
+            self.to(self.index + 1)
 
     def set_wallpaper(self):
         date = self.days[self.index]
