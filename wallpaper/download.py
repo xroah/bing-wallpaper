@@ -25,7 +25,7 @@ def get(url: str, i=0):
         i += 1
 
         if i < _max_retries:
-            return req()
+            return get(url, i)
 
         print(f"Request {url} error: ", e)
 
