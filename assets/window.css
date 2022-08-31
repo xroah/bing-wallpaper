@@ -41,7 +41,7 @@ QMenu::item:selected,
     background-color: #303030;
 }
 
-.text, QMenu::item {
+.text, QMenu::item, #logo {
     color: #fff;
 }
 

@@ -110,9 +110,7 @@ class Window(QMainWindow):
     def init(self):
         self.thumbnail_label.setFixedSize(96, 54)
         self.thumbnail_label.setScaledContents(True)
-        self.logo_label.setPixmap(QPixmap(":/logo.png"))
-        self.logo_label.setFixedSize(30, 30)
-        self.logo_label.setScaledContents(True)
+        self.logo_label.setText("必应壁纸")
         self.min_btn.setIcon(self.get_icon("minus"))
         self.settings_btn.setIcon(self.get_icon("settings"))
         self.settings_btn.setPopupMode(QToolButton.InstantPopup)
