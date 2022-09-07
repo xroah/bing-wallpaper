@@ -2,7 +2,12 @@ import os
 from typing import cast
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QIcon, QFocusEvent
+from PySide6.QtGui import (
+    QPixmap,
+    QIcon,
+    QFocusEvent,
+    QFontMetrics
+)
 from PySide6.QtWidgets import (
     QMainWindow,
     QLabel,
@@ -71,10 +76,9 @@ class Window(QMainWindow):
         summary.layout().setAlignment(Qt.AlignTop)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setCentralWidget(widget)
-        self.setFixedSize(360, 200)
+        self.setFixedSize(360, 180)
         self.setFocusPolicy(Qt.StrongFocus)
         self.init()
-        self.set_status()
 
         self.next_btn.clicked.connect(self.next)
         self.prev_btn.clicked.connect(self.prev)
@@ -87,9 +91,24 @@ class Window(QMainWindow):
         info = self.m.get_current_info()
 
         if info:
+            t_fm = QFontMetrics(self.title_label.font())
+            c_fm = QFontMetrics(self.copyright_label.font())
+            title = t_fm.elidedText(
+                info["title"],
+                Qt.ElideRight,
+                self.title_label.width()
+            )
+            cr = c_fm.elidedText(
+                info["copyright"],
+                Qt.ElideRight,
+                self.copyright_label.width()
+            )
+
+            self.title_label.setText(title)
+            self.title_label.setToolTip(info["title"])
+            self.copyright_label.setText(cr)
+            self.copyright_label.setToolTip(info["copyright"])
             self.date_label.setText(info["date"])
-            self.title_label.setText(info["title"])
-            self.copyright_label.setText(info["copyright"])
             self.thumbnail_label.setPixmap(QPixmap(info["path"]))
 
         self.next_btn.setEnabled(self.m.index != 6)
@@ -136,3 +155,6 @@ class Window(QMainWindow):
     def focusOutEvent(self, event: QFocusEvent) -> None:
         if event.reason() != Qt.PopupFocusReason:
             self.hide()
+
+    def showEvent(self, e) -> None:
+        self.set_status()
